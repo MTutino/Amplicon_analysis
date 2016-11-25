@@ -6,7 +6,7 @@
 		# Write parameters in a file
 		echo -e "-q is:"$PHRED"\n""-l is:"$WINDOW"\n""-O is:"$OVERLAP"\n""-L is:"$LENGTH"\n""-g is:"$FORWARD"\n""-G is:"$REVERSE >> $LOG
 		
-		# If $NO_CUTADAPT is empty (forward and reverse passed) than Cutadapt will be used
+		# If $NO_CUTADAPT is empty (forward and reverse passed) then Cutadapt will be used
 		if [[ -z $NO_CUTADAPT ]]; then		
 				echo "Cutadapt version 1.8.1. Started at $(date|awk '{print $4}')" >> $LOG;
 			set +e
@@ -83,7 +83,7 @@
 		done;
 
 
-		#SPAdes for error correction of illumina miseq reads
+		#SPAdes for error correction of illumina MiSeq reads
 		echo "SPADes version 3.5.0. Started at $(date|awk '{print $4}')" >> $LOG;
 
 		for i in $(ls -d *|sed 's/\///g' 2> /dev/null);do 
@@ -203,26 +203,10 @@ for i in $(ls -d */ 2> /dev/null); do
 		rm -f Stats/Length_R1_trimmed.txt;
 		rm -f Stats/Length_R2_trimmed.txt;
 		
-		#Lets reorganize the outputs of the first step
+		#Reorganize the outputs of the first step
 		mkdir -p QUALITY_CONTROL ;
 		rsync -a Stats/ QUALITY_CONTROL ;
 		rm -r Stats/ ;
-		
-		##R plot needs to be optimised 
-		#Create the Length distribution files with the right format for R
-		#cd QUALITY_CONTROL;
-		#tail -n+3 Length_distribution_raw.txt > Length_distribution_for_R_plots_raw.txt;
-		#tail -n+3 Length_distribution_trimmed.txt > Length_distribution_for_R_plots_trimmed.txt;
-		#Create plots with R.2 different scripts for version 2 and version 3 chemistry
-		#if [ $(awk NR==2'{ print $1 }' Length_distribution_for_R_plots_raw.txt) == 251 ];then 
-		#		Rscript $DIR/R_plots_v2.r;
-		#elif  [ $(awk NR==2'{ print $1 }' Length_distribution_for_R_plots_raw.txt) == 301 ];then
-		#		Rscript $DIR/R_plots_v3.r;
-		#fi;
-		
-		#rm Length_distribution_for_R_plots_raw.txt;
-		#rm Length_distribution_for_R_plots_trimmed.txt;
-		#cd ..;
 		
 				
 		echo "Quality control step finished at $(date|awk '{print $4}')" >> $LOG;
