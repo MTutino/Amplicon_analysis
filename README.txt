@@ -1,3 +1,5 @@
+### The script is meant to be used on the computational shared facility ###
+
 ######################################################################################################################################################################################
 #
 #   This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads. 
