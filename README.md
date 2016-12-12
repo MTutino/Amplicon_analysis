@@ -1,4 +1,4 @@
- #The script is meant to be used on the computational shared facility
+#The script is meant to be used on the computational shared facility
 
 
 
