@@ -1,9 +1,8 @@
-#The script is meant to be used on the computational shared facility
+**The script is meant to be used on the computational shared facility**
 
 
-
-   **This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads** 
-	It is divided in 3 steps:
+**This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads** 
+It is divided in 3 steps:
 
 	1) Quality control with Cutadapt to check for and trim PCR primers, Sickle for quality trimming, SPADes for illumina Miseq errors correction and Pandaseq to merge paired-end reads
 	    (Based on the Dr.UZ Ijaz’s command line tutorial “Illumina Amplicons OTU Construction with Noise Removal” found at www.tinyurl.com/JCBioinformatics)
@@ -31,21 +30,21 @@ You will have to run the programme (or the jobscript if you are using it in CSF)
 
 **REQUIRED FILES:**
 
-Final_name.txt:
+**Final_name.txt:**
 
 Final_name.txt is a text tab-delimited file with two columns without any header. 
 The first column is a list of your files' name, you can get the list this way
 
-for i in $(ls *fastq*);do echo $(basename ${i});done
+	for i in $(ls *fastq*);do echo $(basename ${i});done
 
 The second column is a list of names decided by the user (final name). The final name will be the one you will see in the final plots, decide a meaningful name. Every final name has to be unique and specific for 
 a sample. Forward (R1) and reverse (R2) reads from the same sample have to be linked to the same final name.  
 For the final name the only accepted special characters are underscore "_", dot "." and dash "-".
 
-*** You can create this file in Excel but be careful to save it as Text(Tab delimited) ***
-*** After importing the file from Windows run the command "dos2unix Final_name.txt" to convert it in unix format ***
+*** _You can create this file in Excel but be careful to save it as Text(Tab delimited)_ ***
+*** _After importing the file from Windows run the command "dos2unix Final_name.txt" to convert it in unix format_ ***
 
-EXAMPLE:
+**EXAMPLE:**
 
 Mock_S4_L001_R1_001.fastq.gz	Mock_RUN1
 Mock_S4_L001_R2_001.fastq.gz	Mock_RUN1
@@ -54,77 +53,68 @@ Mock_S5_L001_R2_001.fastq.gz	Mock_RUN2
 Mock_S6_L001_R1_001.fastq.gz  	Mock_RUN3
 Mock_S6_L001_R2_001.fastq.gz	Mock_RUN3
 
-###############################################################################################################################################################
 
-
-###################################################################################################################################################################
-
-Metatable.txt:
+**Metatable.txt:**
 
 This file is important for the third step. You have to use a specific format. 
 You can find a description of it on QIIME website for more information (http://qiime.org/documentation/file_formats.html).
 
-EXAMPLE:
+**EXAMPLE:**
 
-#SampleID	BarcodeSequence	LinkerPrimerSequence    Run     Description
-Mock-RUN1 	TAAGGCGAGCGTAAGA              		 1       Control
-Mock-RUN2      	CGTACTAGGCGTAAGA               		 2       Control
-Mock-RUN3      	AGGCAGAAGCGTAAGA                	 3       Control
+	#SampleID	BarcodeSequence	LinkerPrimerSequence    Run     Description
+	Mock-RUN1 	TAAGGCGAGCGTAAGA              		 1       Control
+	Mock-RUN2      	CGTACTAGGCGTAAGA               		 2       Control
+	Mock-RUN3      	AGGCAGAAGCGTAAGA                	 3       Control
 
 The column "LinkerPrimerSequence" is empty but it cannot be deleted.
 The header is very important. "#SampleID", "Barcode", "LinkerPrimerSequence" and "Description" are mandatory. 
 Between "LinkerPrimerSequence" and "Description" you can add as many columns as you want.
 For every column a PCoA plot will be created during the third step.
 
-*** You can create this file in Excel but be careful to save it as Text(Tab delimited) ***
-*** After importing the file from Windows run the command "dos2unix Metatable.txt" to convert it in unix format ***
+*** _You can create this file in Excel but be careful to save it as Text(Tab delimited)_ ***
+*** _After importing the file from Windows run the command "dos2unix Metatable.txt" to convert it in unix format_ ***
 
-***	During the analysis the Metatable.txt will be checked to be sure that the metatable has the correct format.						***
-***	If necessary this will be modified. You can find the new corrected metatable file in the folder "Metatable_log/Metatable_mod.txt"			*** 
-***	If you are going to use the metatable file for other statistical analyses remind to use the modified one, otherwise the samples name will not match!    ***
+***_During the analysis the Metatable.txt will be checked to be sure that the metatable has the correct format_***
+***_If necessary this will be modified. You can find the new corrected metatable file in the folder "Metatable_log/Metatable_mod.txt"_*** 
+***_If you are going to use the metatable file for other statistical analyses remind to use the modified one, otherwise the samples name will not match!_***
 
-###################################################################################################################################################################
+**OPTIONAL FILE:**
 
-###################################################################################################################################################################
-
-OPTIONAL FILE:
-
-Categories.txt:
+**Categories.txt:**
 
 This file is required if you want to get box plots for the alpha diversity comparison. You will get a box plot for every category you write in the file with different metrics.
 It is just a list (without header and IN ONE COLUMN) of categories present in the Metatable.txt file.
 THE NAMES YOU ARE USING HAVE TO BE THE SAME YOU USED IN THE METATABLE.TXT
 
-*** You can create this file in Excel but be careful to save it as Text(Tab delimited) ***
-*** After importing the file from Windows run the command "dos2unix Categories.txt" to convert it in unix format ***
+***_You can create this file in Excel but be careful to save it as Text(Tab delimited)_***
+***_After importing the file from Windows run the command "dos2unix Categories.txt" to convert it in unix format_***
 
 
-EXAMPLE (these categories are useless):
+**EXAMPLE** (these categories are useless):
 
 BarcodeSequence
 Run
 LinkerPrimerSequence
 Description
 
-###################################################################################################################################################################
 
-Now that you created all the required files and copied the raw files let's see how to use the programme
+Now that you created all the required files, and copied the raw files, let's see how to use the programme
 
 If you are using the programme on CSF load the following modules (you can copy and paste):
 
-#Step1:
-#Cutadapt is included in anaconda
+**Step1:
+(Cutadapt is included in anaconda)
 module load apps/binapps/anaconda/2.2.0
 module load apps/gcc/sickle/1.33
 module load apps/gcc/bioawk/27-08-2013
 module load apps/gcc/pandaseq/2.8
 module load apps/binapps/spades/3.5.0
 module load apps/binapps/fastqc/0.11.3
-#Step2/3:
+Step2/3:
 module load apps/binapps/usearch/6.1.544
 module load apps/gcc/qiime/1.8.0
 module load apps/binapps/vsearch/1.1.3
-#ChimeraSlayer
+(ChimeraSlayer is included in mnicrobiomeutil)
 module load apps/binapps/microbiomeutil/r20110519
 module load apps/binapps/blast/legacy/2.2.26
 module load apps/binapps/usearch/8.0.1623
@@ -132,13 +122,14 @@ module load apps/binapps/fasta_number/02jun2015
 module load apps/binapps/fasta-splitter/0.2.4
 module load apps/binapps/rdp_classifier/2.2
 module load apps/gcc/R/3.2.0
+**
 
 On the other hand, if you are using the programme in interactive mode be sure you have installed all the required programmes and that they are installed in your bin folder. 
 
 
 Best options for the analysis of V3-V4 hypervariable regions [Default options]: -q 20 -l 10 -o 10 -L 380
 
-OPTIONS:
+**OPTIONS:**
    -h      Show this message
    -g      Forward PCR primer, without any barcode/adapter (Cutadapt) ***REQUIRED IF USING CUTADAPT. IF IT IS NOT PASSED, CUTADAPT WILL BE DISABLED***
    -G      Reverse PCR primer, without any barcode/adapter (Cutadapt) ***REQUIRED IF USING CUTADAPT.IF IT IS NOT PASSED, CUTADAPT WILL BE DISABLED***
@@ -150,46 +141,43 @@ OPTIONS:
    -P	   Use this option to decide which pipeline you want to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
    -S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 18 Gb of RAM.
 
- *** To run only the third step ***
+ ***_To run only the third step_***
    -3	   Pass this flag without any argument to run only the third step
    -i	   BIOM file
    -o (Lowercase "O")   Path to the directory where you want to store the result
    -m	   Metatable file. The names in the metatable has to match with those used to create the BIOM file
    -t	   Tree file. It has to be same as used in the pipeline (cannot use SILVA to analyse the data and GreenGenes for the plots)
    
-   ***** IF YOU WANT TO USE SILVA DO NOT RUN THE SCRIPT WITH LESS THAN 5 CORES (at least 22 gb of RAM).  ******
-   ***** QIIME with a large dataset can be very slow. It can take few days to finish the analysis. I advice you to use either Uparse or Vsearch. ******
+   **_IF YOU WANT TO USE SILVA DO NOT RUN THE SCRIPT WITH LESS THAN 5 CORES (at least 22 gb of RAM)_**
+   **_QIIME with a large dataset can be very slow. It can take few days to finish the analysis. I advice you to use either Uparse or Vsearch_**
    
 
-EXAMPLE USAGE IN THE INTERACTIVE MODE:
+#EXAMPLE USAGE IN THE INTERACTIVE MODE:
 
-1)
-## The following command will use default options for QC, the Vsearch pipeline and greengenes database
+1)The following command will use default options for QC, the Vsearch pipeline and greengenes database
 
-Path_to_the_script/mplicon_analysis_pipeline.sh -g CCTACGGGNGGCWGCAG -G GACTACHVGGGTATCTAATCC -P vsearch 
+	Full_Path_to_the_script/amplicon_analysis_pipeline.sh -g CCTACGGGNGGCWGCAG -G GACTACHVGGGTATCTAATCC -P vsearch 
 
-2)
-## The following command will NOT use Cutadapt (e.g. to analyse samples amplified with different primers together. Not raccomanded), will use the uparse pipeline and silva database
+2)The following command will NOT use Cutadapt (e.g. to analyse samples amplified with different primers together. Not raccomanded), will use the uparse pipeline and silva database
 
-Path_to_the_script/Amplicon_analysis_pipeline.sh -P uparse -S
+	Full_Path_to_the_script/Amplicon_analysis_pipeline.sh -P uparse -S
 
-3)
-## The following command will suppress the first step and the analysis will start directly from the second step.
-## Useful if you have already analysed these data, for example with Vsearch, and you want to try a different pipeline or if you used GreenGenes and you want to try Silva
+3)The following command will suppress the first step and the analysis will start directly from the second step.
+Useful if you have already analysed these data, for example with Vsearch, and you want to try a different pipeline or if you used GreenGenes and you want to try Silva
 
-Path_to_the_script/Amplicon_analysis_pipeline.sh -1 suppress -P uparse
+	Path_to_the_script/Amplicon_analysis_pipeline.sh -1 suppress -P uparse
 
-4)
-## The following command will run only the third step
-## Useful if you want to produce new plots after filtering out some samples from the OTU table.
+4)The following command will run only the third step
+Useful if you want to produce new plots after filtering out some samples from the OTU table.
 
-Path_to_the_script/Amplicon_analysis_pipeline.sh -3 -i Path/Vsearch_OTU_tables/otu_table_without_mocks.biom -o Path/RESULTS_2/ -m Path/Metatable_log/Metatable_mod.txt -t Path/Vsearch_OTU_tables/otus.tre
+	Path_to_the_script/Amplicon_analysis_pipeline.sh -3 -i Path/Vsearch_OTU_tables/otu_table_without_mocks.biom -o Path/RESULTS_2/ -m Path/Metatable_log/Metatable_mod.txt -t Path/Vsearch_OTU_tables/otus.tre
 
-EXAMPLE USAGE IN CSF:
+#EXAMPLE USAGE IN CSF:
 
-# To run this programme in CSF you have to write a jobscript. To do that you can use gedit.
-# Type gedit on the command line, this will open the text editor, then copy and paste the following lines
-# Change the path and the flags as explained above
+**To run this programme in CSF you have to write a jobscript. To do that you can use gedit.
+Type gedit on the command line, this will open the text editor, then copy and paste the following lines
+Change the path and the flags as explained above
+**
 
 #!/bin/bash -x
 #$ -S /bin/bash   # Inform SGE we are using the bash shell
@@ -198,31 +186,23 @@ EXAMPLE USAGE IN CSF:
                   # ... important so that commands can be found when jobs run.
 #$ -pe smp.pe 5   # Define how many cores you want to use. REMEMBER NOT TO USE LESS THEN FIVE CORES FOR SILVA 
 
-## The following command will use the vsearch pipeline and greengenes as database
+** #The following command will use the vsearch pipeline and greengenes as database**
 Path_to_the_script/mplicon_analysis_pipeline.sh -g CCTACGGGNGGCWGCAG -G GACTACHVGGGTATCTAATCC -P vsearch
 
-######################################################################################################################################################################################################
+
 #	IF YOU WANT TO REPEAT THE ANALYSIS FILTERING OUT SOME SAMPLES YOU WILL HAVE TO MOVE,RENAME OR DELETE THE "MULTIPLEXED_FILES" FOLDER, THOSE FILES ARE NEVER OVERWRITTEN. 
 #	ON THE OTHER SIDE, ALL THE OTHER FILES WILL BE OVERWRITTEN SO, IF YOU RUN THE PIPELINE WITH THE SAME PARAMETERS, MOVE OR RENAME THE FILES YOU WOULD LIKE TO KEEP BEFORE RUNNING THE PROGRAMME.
-######################################################################################################################################################################################################
-
-###############################################################################################################################################################
-
 
 
 If the programme ran successfully you will get the following output
 
 
-OUTPUT:
+**OUTPUT:**
 
-*******	"QUALITY_CONTROL":
-
-It contains information about length distribution for raw and trimmed data plus the number of reads for every piece of the quality control step.
+"QUALITY_CONTROL": It contains information about length distribution for raw and trimmed data plus the number of reads for every piece of the quality control step.
 
 
-*******	"QIIME_OTU_tables": 
-
-The free version of Usearch V.6.1 cannot handle files bigger than 3 Gb (multiplexed_files/multiplexed_linearized.fasta, not the single raw files).
+"QIIME_OTU_tables": The free version of Usearch V.6.1 cannot handle files bigger than 3 Gb (multiplexed_files/multiplexed_linearized.fasta, not the single raw files).
 If multiplexed_files/multiplexed_linearized.fasta is:
 
 	-smaller than 3GB, an open reference OTU picking and chimera removal will be performed. Here is the output you are interested in:
@@ -245,9 +225,7 @@ If multiplexed_files/multiplexed_linearized.fasta is:
 
 
 
-*******	"Vsearch_OTU_tables", "Uparse_OTU_tables":
-
-These folders have the same files inside.
+"Vsearch_OTU_tables", "Uparse_OTU_tables": These folders have the same files inside.
 
 		1) multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_tax_OTU_table.biom. #Otu table not filtered for low abundance OTUs
 		2) otu_table.biom. Otu table filtered for low abundance OTUs. #filter_otus_from_otu_table.py -i INPUT -o OUTPUT --min_count_fraction 0.00005
@@ -257,9 +235,7 @@ These folders have the same files inside.
 
 
 
-*******	"RESULTS":
-
-Inside this folder you will find a subfolder for every pipeline/reference DB you used (e.g. QIIME_silva/  Uparse_silva/  Vsearch_gg/  Vsearch_silva/) but the content will be the same.
+"RESULTS": Inside this folder you will find a subfolder for every pipeline/reference DB you used (e.g. QIIME_silva/  Uparse_silva/  Vsearch_gg/  Vsearch_silva/) but the content will be the same.
 
 	-table_summary.txt:
 		A file with the sequences count per sample and the total number of OTUs	
