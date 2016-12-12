@@ -2,11 +2,13 @@
 
 
 **This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads** 
+
 It is divided in 3 steps:
 
 	1) Quality control with Cutadapt to check for and trim PCR primers, Sickle for quality trimming, SPADes for illumina Miseq errors correction and Pandaseq to merge paired-end reads
 	    (Based on the Dr.UZ Ijaz’s command line tutorial “Illumina Amplicons OTU Construction with Noise Removal” found at www.tinyurl.com/JCBioinformatics)
 	    (Schirmer and Ijaz et al.,"Insight into biases and sequencing errors for amplicon sequencing with the Illumina MiSeq platform." ,Nucleic Acids Res., 2015)
+	    
 	2) Remove singletons and chimeras, and build an OTU table
 		QIIME pipeline: to remove singletons and chimeras and build otu table and phylogenetic tree (open-reference method with usearch61 if possible (it depends on the files' size), otherwise closed-reference method with #		uclust)
 	
@@ -41,17 +43,17 @@ The second column is a list of names decided by the user (final name). The final
 a sample. Forward (R1) and reverse (R2) reads from the same sample have to be linked to the same final name.  
 For the final name the only accepted special characters are underscore "_", dot "." and dash "-".
 
-*** _You can create this file in Excel but be careful to save it as Text(Tab delimited)_ ***
-*** _After importing the file from Windows run the command "dos2unix Final_name.txt" to convert it in unix format_ ***
+**_You can create this file in Excel but be careful to save it as Text(Tab delimited)_**
+**_After importing the file from Windows run the command "dos2unix Final_name.txt" to convert it in unix format_**
 
 **EXAMPLE:**
 
-Mock_S4_L001_R1_001.fastq.gz	Mock_RUN1
-Mock_S4_L001_R2_001.fastq.gz	Mock_RUN1
-Mock_S5_L001_R1_001.fastq.gz 	Mock_RUN2
-Mock_S5_L001_R2_001.fastq.gz	Mock_RUN2
-Mock_S6_L001_R1_001.fastq.gz  	Mock_RUN3
-Mock_S6_L001_R2_001.fastq.gz	Mock_RUN3
+	Mock_S4_L001_R1_001.fastq.gz	Mock_RUN1
+	Mock_S4_L001_R2_001.fastq.gz	Mock_RUN1
+	Mock_S5_L001_R1_001.fastq.gz 	Mock_RUN2
+	Mock_S5_L001_R2_001.fastq.gz	Mock_RUN2
+	Mock_S6_L001_R1_001.fastq.gz  	Mock_RUN3
+	Mock_S6_L001_R2_001.fastq.gz	Mock_RUN3
 
 
 **Metatable.txt:**
@@ -71,12 +73,12 @@ The header is very important. "#SampleID", "Barcode", "LinkerPrimerSequence" and
 Between "LinkerPrimerSequence" and "Description" you can add as many columns as you want.
 For every column a PCoA plot will be created during the third step.
 
-*** _You can create this file in Excel but be careful to save it as Text(Tab delimited)_ ***
-*** _After importing the file from Windows run the command "dos2unix Metatable.txt" to convert it in unix format_ ***
+**_You can create this file in Excel but be careful to save it as Text(Tab delimited)_**
+**_After importing the file from Windows run the command "dos2unix Metatable.txt" to convert it in unix format_**
 
-***_During the analysis the Metatable.txt will be checked to be sure that the metatable has the correct format_***
-***_If necessary this will be modified. You can find the new corrected metatable file in the folder "Metatable_log/Metatable_mod.txt"_*** 
-***_If you are going to use the metatable file for other statistical analyses remind to use the modified one, otherwise the samples name will not match!_***
+**_During the analysis the Metatable.txt will be checked to be sure that the metatable has the correct format_**
+**_If necessary this will be modified. You can find the new corrected metatable file in the folder "Metatable_log/Metatable_mod.txt"_** 
+**_If you are going to use the metatable file for other statistical analyses remind to use the modified one, otherwise the samples name will not match!_**
 
 **OPTIONAL FILE:**
 
@@ -86,16 +88,16 @@ This file is required if you want to get box plots for the alpha diversity compa
 It is just a list (without header and IN ONE COLUMN) of categories present in the Metatable.txt file.
 THE NAMES YOU ARE USING HAVE TO BE THE SAME YOU USED IN THE METATABLE.TXT
 
-***_You can create this file in Excel but be careful to save it as Text(Tab delimited)_***
-***_After importing the file from Windows run the command "dos2unix Categories.txt" to convert it in unix format_***
+**_You can create this file in Excel but be careful to save it as Text(Tab delimited)_**
+**_After importing the file from Windows run the command "dos2unix Categories.txt" to convert it in unix format_**
 
 
 **EXAMPLE** (these categories are useless):
 
-BarcodeSequence
-Run
-LinkerPrimerSequence
-Description
+	BarcodeSequence
+	Run
+	LinkerPrimerSequence
+	Description
 
 
 Now that you created all the required files, and copied the raw files, let's see how to use the programme
