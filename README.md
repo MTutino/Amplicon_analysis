@@ -104,7 +104,7 @@ Now that you created all the required files, and copied the raw files, let's see
 
 If you are using the programme on CSF load the following modules (you can copy and paste):
 
-**Step1:
+**Step1:**
 
 	(Cutadapt is included in anaconda)
 	module load apps/binapps/anaconda/2.2.0
@@ -113,7 +113,7 @@ If you are using the programme on CSF load the following modules (you can copy a
 	module load apps/gcc/pandaseq/2.8
 	module load apps/binapps/spades/3.5.0
 	module load apps/binapps/fastqc/0.11.3
-Step2/3:
+**Step2/3:**
 
 	module load apps/binapps/usearch/6.1.544
 	module load apps/gcc/qiime/1.8.0
@@ -126,7 +126,6 @@ Step2/3:
 	module load apps/binapps/fasta-splitter/0.2.4
 	module load apps/binapps/rdp_classifier/2.2
 	module load apps/gcc/R/3.2.0
-**
 
 On the other hand, if you are using the programme in interactive mode be sure you have installed all the required programmes and that they are installed in your bin folder. 
 
@@ -154,8 +153,8 @@ Best options for the analysis of V3-V4 hypervariable regions [Default options]: 
    	-m	   Metatable file. The names in the metatable has to match with those used to create the BIOM file
    	-t	   Tree file. It has to be same as used in the pipeline (cannot use SILVA to analyse the data and GreenGenes for the plots)
    
-   **_IF YOU WANT TO USE SILVA DO NOT RUN THE SCRIPT WITH LESS THAN 5 CORES (at least 22 gb of RAM)_**
-   **_QIIME with a large dataset can be very slow. It can take few days to finish the analysis. I advice you to use either Uparse or Vsearch_**
+**_IF YOU WANT TO USE SILVA DO NOT RUN THE SCRIPT WITH LESS THAN 5 CORES (at least 22 gb of RAM)_**
+**_QIIME with a large dataset can be very slow. It can take few days to finish the analysis. I advice you to use either Uparse or Vsearch_**
    
 
 #EXAMPLE USAGE IN THE INTERACTIVE MODE:
