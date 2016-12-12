@@ -1,23 +1,23 @@
-### The script is meant to be used on the computational shared facility ###
+ **The script is meant to be used on the computational shared facility**
 
-######################################################################################################################################################################################
-#
-#   This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads. 
-#	It is divided in 3 steps:
-#
-#	1) Quality control with Cutadapt to check for and trim PCR primers, Sickle for quality trimming, SPADes for illumina Miseq errors correction and Pandaseq to merge paired-end reads
-#	    (Based on the Dr.UZ Ijaz’s command line tutorial “Illumina Amplicons OTU Construction with Noise Removal” found at www.tinyurl.com/JCBioinformatics)
-#	    (Schirmer and Ijaz et al.,"Insight into biases and sequencing errors for amplicon sequencing with the Illumina MiSeq platform." ,Nucleic Acids Res., 2015)
-#	2) Remove singletons and chimeras, and build an OTU table
-#		QIIME pipeline: to remove singletons and chimeras and build otu table and phylogenetic tree (open-reference method with usearch61 if possible (it depends on the files' size), otherwise closed-reference method with #		uclust)
-#	
-#		UPARSE pipeline: free version limited to 4Gm RAM
-#	
-#		Vsearch pipeline: A freely available programme almost identical to Uparse but not limited to 4GB RAM
-#	
-#	3)  QIIME to perform beta and alpha diversity analysis
-#
-######################################################################################################################################################################################
+
+
+   **This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads** 
+	It is divided in 3 steps:
+
+	1) Quality control with Cutadapt to check for and trim PCR primers, Sickle for quality trimming, SPADes for illumina Miseq errors correction and Pandaseq to merge paired-end reads
+	    (Based on the Dr.UZ Ijaz’s command line tutorial “Illumina Amplicons OTU Construction with Noise Removal” found at www.tinyurl.com/JCBioinformatics)
+	    (Schirmer and Ijaz et al.,"Insight into biases and sequencing errors for amplicon sequencing with the Illumina MiSeq platform." ,Nucleic Acids Res., 2015)
+	2) Remove singletons and chimeras, and build an OTU table
+		QIIME pipeline: to remove singletons and chimeras and build otu table and phylogenetic tree (open-reference method with usearch61 if possible (it depends on the files' size), otherwise closed-reference method with #		uclust)
+	
+		UPARSE pipeline: free version limited to 4Gm RAM
+	
+		Vsearch pipeline: A freely available programme almost identical to Uparse but not limited to 4GB RAM
+	
+	3)  QIIME to perform beta and alpha diversity analysis
+
+
 
 
 The script requires the files "Final_name.txt" and "Metatable.txt". "Categories.txt" is optional.
@@ -29,9 +29,7 @@ Create a folder (the name is not important) with raw files to analise inside (fa
 You will have to run the programme (or the jobscript if you are using it in CSF) inside that folder.
 
 
-###############################################################################################################################################################
-
-REQUIRED FILES:
+**REQUIRED FILES:**
 
 Final_name.txt:
 
