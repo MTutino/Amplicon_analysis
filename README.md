@@ -106,7 +106,7 @@ If you are using the programme on CSF load the following modules (you can copy a
 
 **Step1:**
 
-	(Cutadapt is included in anaconda)
+	#(Cutadapt is included in anaconda)
 	module load apps/binapps/anaconda/2.2.0
 	module load apps/gcc/sickle/1.33
 	module load apps/gcc/bioawk/27-08-2013
@@ -118,7 +118,7 @@ If you are using the programme on CSF load the following modules (you can copy a
 	module load apps/binapps/usearch/6.1.544
 	module load apps/gcc/qiime/1.8.0
 	module load apps/binapps/vsearch/1.1.3
-	(ChimeraSlayer is included in mnicrobiomeutil)
+	#(ChimeraSlayer is included in mnicrobiomeutil)
 	module load apps/binapps/microbiomeutil/r20110519
 	module load apps/binapps/blast/legacy/2.2.26
 	module load apps/binapps/usearch/8.0.1623
@@ -181,8 +181,7 @@ Useful if you want to produce new plots after filtering out some samples from th
 
 **To run this programme in CSF you have to write a jobscript. To do that you can use gedit.
 Type gedit on the command line, this will open the text editor, then copy and paste the following lines
-Change the path and the flags as explained above
-**
+Change the path and the flags as explained above**
 
 	#!/bin/bash -x
 	#$ -S /bin/bash   # Inform SGE we are using the bash shell
@@ -196,8 +195,7 @@ Change the path and the flags as explained above
 
 
 **IF YOU WANT TO REPEAT THE ANALYSIS FILTERING OUT SOME SAMPLES YOU WILL HAVE TO MOVE,RENAME OR DELETE THE "MULTIPLEXED_FILES" FOLDER, THOSE FILES ARE NEVER OVERWRITTEN. 
-ON THE OTHER SIDE, ALL THE OTHER FILES WILL BE OVERWRITTEN SO, IF YOU RUN THE PIPELINE WITH THE SAME PARAMETERS, MOVE OR RENAME THE FILES YOU WOULD LIKE TO KEEP BEFORE RUNNING THE PROGRAMME.
-**
+ON THE OTHER SIDE, ALL THE OTHER FILES WILL BE OVERWRITTEN SO, IF YOU RUN THE PIPELINE WITH THE SAME PARAMETERS, MOVE OR RENAME THE FILES YOU WOULD LIKE TO KEEP BEFORE RUNNING THE PROGRAMME.**
 
 If the programme ran successfully you will get the following output
 
