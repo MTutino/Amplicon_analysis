@@ -105,6 +105,7 @@ Now that you created all the required files, and copied the raw files, let's see
 If you are using the programme on CSF load the following modules (you can copy and paste):
 
 **Step1:
+
 	(Cutadapt is included in anaconda)
 	module load apps/binapps/anaconda/2.2.0
 	module load apps/gcc/sickle/1.33
@@ -113,6 +114,7 @@ If you are using the programme on CSF load the following modules (you can copy a
 	module load apps/binapps/spades/3.5.0
 	module load apps/binapps/fastqc/0.11.3
 Step2/3:
+
 	module load apps/binapps/usearch/6.1.544
 	module load apps/gcc/qiime/1.8.0
 	module load apps/binapps/vsearch/1.1.3
@@ -194,19 +196,20 @@ Change the path and the flags as explained above
 	Path_to_the_script/mplicon_analysis_pipeline.sh -g CCTACGGGNGGCWGCAG -G GACTACHVGGGTATCTAATCC -P vsearch
 
 
-#	IF YOU WANT TO REPEAT THE ANALYSIS FILTERING OUT SOME SAMPLES YOU WILL HAVE TO MOVE,RENAME OR DELETE THE "MULTIPLEXED_FILES" FOLDER, THOSE FILES ARE NEVER OVERWRITTEN. 
-#	ON THE OTHER SIDE, ALL THE OTHER FILES WILL BE OVERWRITTEN SO, IF YOU RUN THE PIPELINE WITH THE SAME PARAMETERS, MOVE OR RENAME THE FILES YOU WOULD LIKE TO KEEP BEFORE RUNNING THE PROGRAMME.
-
+**IF YOU WANT TO REPEAT THE ANALYSIS FILTERING OUT SOME SAMPLES YOU WILL HAVE TO MOVE,RENAME OR DELETE THE "MULTIPLEXED_FILES" FOLDER, THOSE FILES ARE NEVER OVERWRITTEN. 
+ON THE OTHER SIDE, ALL THE OTHER FILES WILL BE OVERWRITTEN SO, IF YOU RUN THE PIPELINE WITH THE SAME PARAMETERS, MOVE OR RENAME THE FILES YOU WOULD LIKE TO KEEP BEFORE RUNNING THE PROGRAMME.
+**
 
 If the programme ran successfully you will get the following output
 
 
 **OUTPUT:**
 
-"QUALITY_CONTROL": It contains information about length distribution for raw and trimmed data plus the number of reads for every piece of the quality control step.
+**"QUALITY_CONTROL"**: It contains information about length distribution for raw and trimmed data plus the number of reads for every piece of the quality control step.
 
 
-"QIIME_OTU_tables": The free version of Usearch V.6.1 cannot handle files bigger than 3 Gb (multiplexed_files/multiplexed_linearized.fasta, not the single raw files).
+**"QIIME_OTU_tables"**: The free version of Usearch V.6.1 cannot handle files bigger than 3 Gb (multiplexed_files/multiplexed_linearized.fasta, not the single raw files).
+
 If multiplexed_files/multiplexed_linearized.fasta is:
 
 	-smaller than 3GB, an open reference OTU picking and chimera removal will be performed. Here is the output you are interested in:
@@ -229,7 +232,7 @@ If multiplexed_files/multiplexed_linearized.fasta is:
 
 
 
-"Vsearch_OTU_tables", "Uparse_OTU_tables": These folders have the same files inside.
+**"Vsearch_OTU_tables"**, **"Uparse_OTU_tables"**: These folders have the same files inside.
 
 		1) multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_tax_OTU_table.biom. #Otu table not filtered for low abundance OTUs
 		2) otu_table.biom. Otu table filtered for low abundance OTUs. #filter_otus_from_otu_table.py -i INPUT -o OUTPUT --min_count_fraction 0.00005
@@ -239,7 +242,7 @@ If multiplexed_files/multiplexed_linearized.fasta is:
 
 
 
-"RESULTS": Inside this folder you will find a subfolder for every pipeline/reference DB you used (e.g. QIIME_silva/  Uparse_silva/  Vsearch_gg/  Vsearch_silva/) but the content will be the same.
+**"RESULTS"**: Inside this folder you will find a subfolder for every pipeline/reference DB you used (e.g. QIIME_silva/  Uparse_silva/  Vsearch_gg/  Vsearch_silva/) but the content will be the same.
 
 	-table_summary.txt:
 		A file with the sequences count per sample and the total number of OTUs	
