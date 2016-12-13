@@ -1,5 +1,6 @@
-**The script is meant to be used on the computational shared facility**
+#DESCRIPTION
 
+**The script is meant to be used on the computational shared facility**
 
 **This script has been designed for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads** 
 
@@ -30,7 +31,7 @@ Create a folder (the name is not important) with raw files to analise inside (fa
 You will have to run the programme (or the jobscript if you are using it in CSF) inside that folder.
 
 
-**REQUIRED FILES:**
+#REQUIRED FILES
 
 **Final_name.txt:**
 
@@ -102,6 +103,7 @@ THE NAMES YOU ARE USING HAVE TO BE THE SAME YOU USED IN THE METATABLE.TXT
 
 Now that you created all the required files, and copied the raw files, let's see how to use the programme
 
+#MUDULES
 If you are using the programme on CSF load the following modules (you can copy and paste):
 
 **Step1:**
@@ -132,7 +134,7 @@ On the other hand, if you are using the programme in interactive mode be sure yo
 
 Best options for the analysis of V3-V4 hypervariable regions [Default options]: -q 20 -l 10 -o 10 -L 380
 
-**OPTIONS:**
+#OPTIONS
 
 	-h      Show this message
    	-g      Forward PCR primer, without any barcode/adapter (Cutadapt) ***REQUIRED IF USING CUTADAPT. IF IT IS NOT PASSED, CUTADAPT WILL BE DISABLED***
@@ -200,7 +202,7 @@ ON THE OTHER SIDE, ALL THE OTHER FILES WILL BE OVERWRITTEN SO, IF YOU RUN THE PI
 If the programme ran successfully you will get the following output
 
 
-**OUTPUT:**
+#OUTPUT:
 
 **"QUALITY_CONTROL"**: It contains information about length distribution for raw and trimmed data plus the number of reads for every piece of the quality control step.
 
