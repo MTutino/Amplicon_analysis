@@ -13,9 +13,9 @@ It is divided in 3 steps:
 	2) Remove singletons and chimeras, and build an OTU table
 		QIIME pipeline: to remove singletons and chimeras and build otu table and phylogenetic tree (open-reference method with usearch61 if possible (it depends on the files' size), otherwise closed-reference method with #		uclust)
 	
-		UPARSE pipeline: free version limited to 4Gm RAM
+		UPARSE pipeline: free version limited to 4Gb RAM
 	
-		Vsearch pipeline: A freely available programme almost identical to Uparse but not limited to 4GB RAM
+		Vsearch pipeline: A freely available programme almost identical to Uparse but not limited to 4Gb RAM
 	
 	3)  QIIME to perform beta and alpha diversity analysis
 
