@@ -132,9 +132,8 @@ If you are using the programme on CSF load the following modules (you can copy a
 On the other hand, if you are using the programme in interactive mode be sure you have installed all the required programmes and that they are installed in your bin folder. 
 
 
-Best options for the analysis of V3-V4 hypervariable regions [Default options]: -q 20 -l 10 -o 10 -L 380
-
 #OPTIONS
+Best options for the analysis of V3-V4 hypervariable regions [Default options]: -q 20 -l 10 -o 10 -L 380
 
 	-h      Show this message
    	-g      Forward PCR primer, without any barcode/adapter (Cutadapt) ***REQUIRED IF USING CUTADAPT. IF IT IS NOT PASSED, CUTADAPT WILL BE DISABLED***
@@ -145,7 +144,7 @@ Best options for the analysis of V3-V4 hypervariable regions [Default options]: 
    	-L      Minimum length in bp for a sequence to be kept after overlapping [default 380] (Pandaseq) ***OPTIONAL***
    	-1 (One)     Use this option "-1 suppress" to skip the Quality Control step
    	-P	   Use this option to decide which pipeline you want to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
-   	-S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 18 Gb of RAM.
+   	-S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
 
  ***_To run only the third step_***
  
