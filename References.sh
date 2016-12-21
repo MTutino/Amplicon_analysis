@@ -1,12 +1,20 @@
 #!/bin/bash
 
+#Path to Script's directory
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
+
+
 #GreenGenes 13_8
-if [[ -s gg_13_8_otus ]];
+#Create the directory for greengenes if not present
+mkdir -p $DIR/gg_13_8_otus;
+
+#Check if directory is empty. if empty, download the reference 
+if [[ -s $DIR/gg_13_8_otus ]];
 then
 	echo "gg_13_8_otus folder not empty"
 else
 
-	cd gg_13_8_otus
+	cd $DIR/gg_13_8_otus
 
 	wget ftp://greengenes.microbio.me/greengenes_release/gg_13_5/gg_13_8_otus.tar.gz
 
@@ -19,12 +27,15 @@ else
 fi
 
 #Silva 
+#Create the directory for Silva if not present
+mkdir -p $DIR/Silva;
 
-if [[ -s Silva ]];
+#Check if directory is empty. if empty, download the reference
+if [[ -s $DIR/Silva ]];
 then
 	echo "Silva folder not empty"
 else
-	cd Silva
+	cd $DIR/Silva
 
 	wget https://www.arb-silva.de/fileadmin/silva_databases/qiime/Silva_119_release.zip
 	unzip Silva_119_release.zip
@@ -39,12 +50,16 @@ fi
 
 
 #RDPClassifier
-if [[ -s RDPClassifier_16S_trainsetNo14_rawtrainingdata ]];
+#Create the directory for RDPClassifier if not present
+mkdir -p $DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata;
+
+#Check if directory is empty. if empty, download the reference
+if [[ -s $DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata ]];
 then
 	echo "RDPClassifier_16S_trainsetNo14_rawtrainingdata folder not empty"
 
 else
-	cd RDPClassifier_16S_trainsetNo14_rawtrainingdata
+	cd $DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata
 
 	wget http://sourceforge.net/projects/rdp-classifier/files/RDP_Classifier_TrainingData/RDPClassifier_16S_trainsetNo14_rawtrainingdata.zip
 
