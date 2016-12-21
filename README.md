@@ -103,7 +103,7 @@ THE NAMES YOU ARE USING HAVE TO BE THE SAME YOU USED IN THE METATABLE.TXT
 
 Now that you created all the required files, and copied the raw files, let's see how to use the programme
 
-#MUDULES
+#MODULES
 If you are using the programme on CSF load the following modules (you can copy and paste):
 
 **Step1:**
