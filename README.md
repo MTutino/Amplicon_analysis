@@ -145,6 +145,7 @@ Best options for the analysis of V3-V4 hypervariable regions [Default options]: 
    	-1 (One)     Use this option "-1 suppress" to skip the Quality Control step
    	-P	   Use this option to decide which pipeline you want to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
    	-S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
+   	-r	   Path to the directory with the reference databases, if not same as the script directory ***OPTIONAL***
 
  ***_To run only the third step_***
  
