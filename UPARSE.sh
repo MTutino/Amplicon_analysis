@@ -10,13 +10,18 @@ check_dimension
 
 # Set a variable to give a short name for the USEARCH binary
 UPARSE=$(which usearch8.0.1623_i86linux32);
-	
+
+# Set up a temporary file to capture the stderr output from the
+# Vsearch steps of interest, using the idiom 'CMD 2> >(tee -a FILE >&2)'
+# (see e.g. http://stackoverflow.com/a/692407/579925)
+UPARSE_STDERR=$(mktemp --tmpdir=$(pwd) --suffix=".uparse")
+
 mkdir -p Multiplexed_files/Uparse_pipeline
 # If the dimension is in megabyte or is smaller then 3 gigabyte we can use usearch for dereplication
 if [[ -n "$megabyte" ]] || [[ -n "$gigabyte" ]] && [[ "$gigabyte" -le "3" ]]; then
 		echo "-derep_fulllength $(date|awk '{print $4}')" >> $LOG;
-		$UPARSE -derep_fulllength Multiplexed_files/multiplexed_linearized.fasta -fastaout Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta -sizeout -threads $NSLOTS;
-		SING=$(grep singletons *.e$JOB_ID);
+		$UPARSE -derep_fulllength Multiplexed_files/multiplexed_linearized.fasta -fastaout Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta -sizeout -threads $NSLOTS 2> >(tee $UPARSE_STDERR >&2);
+		SING=$(grep singletons $UPARSE_STDERR);
 		echo $SING| awk '{print "singletons discarded "$9" ("$7" reads)"}'|sed 's/(//;s/)//' >> $LOG ;
 else
 		# I will use a piece of Vsearch just for demultiplexing.This is extremely faster than the following workaround
@@ -32,15 +37,15 @@ $UPARSE -sortbysize Multiplexed_files/Uparse_pipeline/multiplexed_linearized_der
 
 # cluster OTUs and de novo chimera removal
 echo "cluster_otus (de novo chimera removal) $(date|awk '{print $4}')" >> $LOG;
-$UPARSE -cluster_otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2.fasta -otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta;
-CHIM_DE=$(awk '/chimeras/' *.e$JOB_ID);
+$UPARSE -cluster_otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2.fasta -otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta 2> >(tee $UPARSE_STDERR >&2);
+CHIM_DE=$(awk '/chimeras/' $UPARSE_STDERR);
 echo "{$CHIM_DE}"|head -1|awk 'END {print "De novo chimera removal found : "$NF" Chimeras ("$(NF-2)" OTUs). "$(NF-4)" OTUs left."}'| sed 's/(//1;s/)//1'|sed 's/\r//g' >> $LOG;
 		
 # Reference chimera removal
 echo "-uchime_ref (reference chimera removal) $(date|awk '{print $4}')" >> $LOG;
-$UPARSE -uchime_ref Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta -db $CHIM -strand plus -nonchimeras Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta -threads $NSLOTS;
+$UPARSE -uchime_ref Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta -db $CHIM -strand plus -nonchimeras Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta -threads $NSLOTS 2> >(tee $UPARSE_STDERR >&2);
 
-CHIM_REF=$(grep -E chimeras\|found *.e$JOB_ID);
+CHIM_REF=$(grep -E chimeras\|found $UPARSE_STDERR);
 #I am not sure this will work any time
 echo "{$CHIM_REF}"|grep -v +|head -2|tail -1|awk 'END {print "Reference based chimera removal found : "$NF" Chimeras ("$(NF-3)" OTUs)"}'| sed 's/(//1;s/)//1'|sed 's/\r//g' >> $LOG;
 		
