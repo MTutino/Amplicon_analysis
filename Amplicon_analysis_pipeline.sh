@@ -226,25 +226,24 @@ export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
 		
 #Check for required programs in current environment
 #Report missing programs and exit if any are not installed/loaded
-REQUIRED_PROGRAMS=\
-"cutadapt
- sickle
- fastqc
- spades
- bioawk
- pandaseq
- usearch8.0.1623_i86linux32
- vsearch113
- ChimeraSlayer.pl
- usearch6.1.544_i86linux32
- print_qiime_config.py
- fasta-splitter.pl
- fasta_number.py
- blastall
- R"
+REQUIRED_PROGRAMS="cutadapt
+sickle
+fastqc
+spades
+bioawk
+pandaseq
+usearch8.0.1623_i86linux32
+vsearch113
+ChimeraSlayer.pl
+usearch6.1.544_i86linux32
+print_qiime_config.py
+fasta-splitter.pl
+fasta_number.py
+blastall
+R"
 MISSING_PROGRAMS=
 for prog in $REQUIRED_PROGRAMS ; do
-    echo -n Checking for ${prog}...
+    echo -n "Checking for ${prog}..."
     if [ -z "$(which $prog)" ] ; then
 	echo missing
 	MISSING_PROGRAMS=yes
