@@ -234,105 +234,37 @@ fi;
 #Path to Script's directory
 export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
 		
-#Read in the list, create a variable for every programme and exit if the programme is not installed/loaded
-LIST=$(echo -e "cutadapt\nsickle\nfastqc\nspades\nbioawk\npandaseq\nusearch8.0.1623_i86linux32\nvsearch113\nChimeraSlayer.pl\nusearch6.1.544_i86linux32\nprint_qiime_config.py\nfasta-splitter.pl\nfasta_number.py\nblastall\nR");
-i=1;
-while read -r programme; do 
-		export PROG_$i="$programme";
-		((++i));
-done <<< "$LIST" ;
-
-#I tried to use a while and a for loops but they did not work with "which"
-PATH_1=$(which $PROG_1);
-if [ -z "$PATH_1" ];then 
-		echo "I could not find $PROG_1";
-		echo "Make sure you can run $PROG_1 inside the working directory";
-		exit 1;
-fi;
-PATH_2=$(which $PROG_2);
-if [ -z "$PATH_2" ];then 
-		echo "I could not find $PROG_2";
-		echo "Make sure you can run $PROG_2 inside the working directory";
-		exit 1;
-fi;
-PATH_3=$(which $PROG_3);
-if [ -z "$PATH_3" ];then 
-		echo "I could not find $PROG_3";
-		echo "Make sure you can run $PROG_3 inside the working directory";
-		exit 1;
-fi;
-PATH_4=$(which $PROG_4);
-if [ -z "$PATH_4" ];then 
-		echo "I could not find $PROG_4";
-		echo "Make sure you can run $PROG_4 inside the working directory";
-		exit 1;
-fi;
-PATH_5=$(which $PROG_5);
-if [ -z "$PATH_5" ];then 
-		echo "I could not find $PROG_5";
-		echo "Make sure you can run $PROG_5 inside the working directory";
-		exit 1;
-fi;
-PATH_6=$(which $PROG_6);
-if [ -z "$PATH_6" ];then 
-		echo "I could not find $PROG_6";
-		echo "Make sure you can run $PR_6 inside the working directory";
-		exit 1;
-fi;
-PATH_7=$(which $PROG_7);
-if [ -z "$PATH_7" ];then 
-		echo "I could not find $PROG_7";
-		echo "Make sure you can run $PROG_7 inside the working directory";
-		exit 1;
-fi;
-PATH_8=$(which $PROG_8);
-if [ -z "$PATH_8" ];then 
-		echo "I could not find $PROG_8";
-		echo "Make sure you can run $PROG_8 inside the working directory";
-		exit 1;
-fi;
-PATH_9=$(which $PROG_9);
-if [ -z "$PATH_9" ];then 
-		echo "I could not find $PROG_9";
-		echo "Make sure you can run $PROG_9 inside the working directory";
-		exit 1;
-fi;
-PATH_10=$(which $PROG_10);
-if [ -z "$PATH_10" ];then 
-		echo "I could not find $PROG_10";
-		echo "Make sure you can run $PROG_10 inside the working directory";
-		exit 1;
-fi;
-PATH_11=$(which $PROG_11);
-if [ -z "$PATH_11" ];then 
-		echo "I could not find $PROG_11";
-		echo "Make sure you can run $PROG_11 inside the working directory";
-		exit 1;
-fi;
-PATH_12=$(which $PROG_12);
-if [ -z "$PATH_12" ];then 
-		echo "I could not find $PROG_12";
-		echo "Make sure you can run $PROG_12 inside the working directory";
-		exit 1;
-fi;
-PATH_13=$(which $PROG_13);
-if [ -z "$PATH_13" ];then 
-		echo "I could not find $PROG_13";
-		echo "Make sure you can run $PROG_13 inside the working directory";
-		exit 1;
-fi;
-PATH_14=$(which $PROG_14);
-if [ -z "$PATH_14" ];then 
-		echo "I could not find $PROG_14";
-		echo "Make sure you can run $PROG_14 inside the working directory";
-		exit 1;
-fi;
-PATH_15=$(which $PROG_15);
-if [ -z "$PATH_15" ];then 
-		echo "I could not find $PROG_15";
-		echo "Make sure you can run $PROG_15 inside the working directory";
-		exit 1;
-fi;
+#Check for required programs in current environment
+#Report missing programs and exit if any are not installed/loaded
+REQUIRED_PROGRAMS="cutadapt
+sickle
+fastqc
+spades
+bioawk
+pandaseq
+usearch8.0.1623_i86linux32
+vsearch113
+ChimeraSlayer.pl
+usearch6.1.544_i86linux32
+print_qiime_config.py
+fasta-splitter.pl
+fasta_number.py
+blastall
+R"
+MISSING_PROGRAMS=
+for prog in $REQUIRED_PROGRAMS ; do
+    echo -n "Checking for ${prog}..."
+    if [ -z "$(which $prog)" ] ; then
+	echo missing
+	MISSING_PROGRAMS=yes
+    else
+	echo ok
+    fi
+done
+if [ ! -z "$MISSING_PROGRAMS" ] ; then
+    echo "One or more required programs are missing"
+    exit 1
+fi
 
 #If $STEP3 is empty (the argument -3 has not been passed)  then the script will run the entire pipeline
 if [[ -z $STEP3 ]]; then
