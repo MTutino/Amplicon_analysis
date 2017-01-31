@@ -55,6 +55,7 @@ OPTIONS:
    -1 (One)     Use this option "-1 suppress" to skip the QC step
    -P	   Use this option to decide which pipeline to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
    -S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
+   -r      Path to the directory with the reference databases, if not same as the script directory ***OPTIONAL***
 
  *** To run only the third step ***
    -3	   Pass this flag without any argument to run only the third step
@@ -152,9 +153,10 @@ export BIOM=
 export RESULTS_PATH=
 export METATABLE=
 export TREE=
+export REF_DATA_PATH=
 
 #Get the arguments
-while getopts “hg:G:q:l:O:L:1:P:Si:o:m:t:3” OPTION
+while getopts “hg:G:q:l:O:L:1:P:Si:o:m:t:r:3” OPTION
 do
      case $OPTION in
          h)
@@ -203,6 +205,14 @@ do
          t)
              export TREE=$OPTARG
              ;;
+	 r)
+	     if [ ! -d "$OPTARG" ] ; then
+		 echo "Fatal: Non-existent directory '$OPTARG' supplied to -r option" >&2
+		 exit 1
+	     else
+		 export REF_DATA_PATH=$(cd "$OPTARG" && pwd)
+	     fi
+	     ;;
          \?)
              echo "invalid option: $OPTARG" >> $LOG
 			 usage
@@ -495,27 +505,48 @@ set -e
 				awk 'NR==1 {print ; next} {printf /^>/ ? "\n"$0"\n" : $1} END {print}' Multiplexed_files/multiplexed.fasta > Multiplexed_files/multiplexed_linearized.fasta;
 
 		fi;
+
+		# Reference databases directory
+		export REF_DATA_PATH="${REF_DATA_PATH:-$DIR}"
+		echo "Expecting reference databases under $REF_DATA_PATH"
 	
 		# Define the path for every reference we are going to use. Not all of them are actually used.
 		if [[ -z $SILVA ]]; then
 				echo "Reference database: GreenGenes 13_8" >> $LOG;
 				#Greengenes
-				export REF="$DIR/gg_13_8_otus/rep_set/97_otus.fasta";
-				export TAX="$DIR/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt";
-				export TREE="$DIR/gg_13_8_otus/trees/97_otus.tree";
-				export ALIGNED="$DIR/gg_13_8_otus/rep_set_aligned/97_otus.fasta";
-				export CORE="$DIR/gg_13_8_otus/rep_set_aligned/97_otus.fasta" ;
-				export CHIM="$DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+				export REF="$REF_DATA_PATH/gg_13_8_otus/rep_set/97_otus.fasta";
+				export TAX="$REF_DATA_PATH/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt";
+				export TREE="$REF_DATA_PATH/gg_13_8_otus/trees/97_otus.tree";
+				export ALIGNED="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta";
+				export CORE="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta" ;
+				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
 		else	
 				echo "Reference database: Silva_119" >> $LOG;
 				#Silva
-				export REF="$DIR/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna";
-				export TAX="$DIR/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt";
-				export TREE="$DIR/Silva/Silva119_release/97_FastTree_trees/Silva_119_rep_set97_aligned_16S_only_pfiltered.tre";
-				export ALIGNED="$DIR/Silva/Silva119_release_aligned_rep_files/97_16S_only/Silva_119_rep_set97_aligned_16S_only.fna";
-				export CORE="$DIR/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
-				export CHIM="$DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+				export REF="$REF_DATA_PATH/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna";
+				export TAX="$REF_DATA_PATH/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt";
+				export TREE="$REF_DATA_PATH/Silva/Silva119_release/97_FastTree_trees/Silva_119_rep_set97_aligned_16S_only_pfiltered.tre";
+				export ALIGNED="$REF_DATA_PATH/Silva/Silva119_release_aligned_rep_files/97_16S_only/Silva_119_rep_set97_aligned_16S_only.fna";
+				export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
+				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
 		fi;
+		# Check that the reference data actually exists
+		echo "Checking for reference databases:"
+		MISSING_DATABASES=
+		for reference_db in $REF $TAX $TREE $ALIGNED $CORE $CHIM ; do
+		    echo -n "${reference_db}..."
+		    if [ ! -e $reference_db ] ; then
+			echo missing
+			MISSING_DATABASES=yes
+		    else
+			echo ok
+		    fi
+		done
+		if [ ! -z "$MISSING_DATABASES" ] ; then
+		    echo "One or more reference databases are missing" >&2
+		    exit 1
+		fi
+
 ################################################################## SECOND_STEP ###################################################################
 		#Exit if no pipeline specified
 		if [ -z $PIPELINE ]; then
