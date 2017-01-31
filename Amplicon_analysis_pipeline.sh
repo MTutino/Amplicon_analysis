@@ -206,7 +206,12 @@ do
              export TREE=$OPTARG
              ;;
 	 r)
-	     export REF_DATA_PATH=$(cd "$OPTARG" && pwd)
+	     if [ ! -d "$OPTARG" ] ; then
+		 echo "Fatal: Non-existent directory '$OPTARG' supplied to -r option" >&2
+		 exit 1
+	     else
+		 export REF_DATA_PATH=$(cd "$OPTARG" && pwd)
+	     fi
 	     ;;
          \?)
              echo "invalid option: $OPTARG" >> $LOG
