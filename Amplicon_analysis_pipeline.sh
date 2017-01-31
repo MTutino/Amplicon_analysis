@@ -530,6 +530,23 @@ set -e
 				export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
 				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
 		fi;
+		# Check that the reference data actually exists
+		echo "Checking for reference databases:"
+		MISSING_DATABASES=
+		for reference_db in $REF $TAX $TREE $ALIGNED $CORE $CHIM ; do
+		    echo -n "${reference_db}..."
+		    if [ ! -e $reference_db ] ; then
+			echo missing
+			MISSING_DATABASES=yes
+		    else
+			echo ok
+		    fi
+		done
+		if [ ! -z "$MISSING_DATABASES" ] ; then
+		    echo "One or more reference databases are missing" >&2
+		    exit 1
+		fi
+
 ################################################################## SECOND_STEP ###################################################################
 		#Exit if no pipeline specified
 		if [ -z $PIPELINE ]; then
