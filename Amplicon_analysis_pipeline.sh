@@ -242,15 +242,19 @@ fastqc
 spades
 bioawk
 pandaseq
-usearch8.0.1623_i86linux32
 vsearch113
 ChimeraSlayer.pl
-usearch6.1.544_i86linux32
 print_qiime_config.py
 fasta-splitter.pl
 fasta_number.py
 blastall
 R"
+# Add usearch executables if using UPARSE pipeline
+if [[ "$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')" == "UPARSE" ]] ; then
+    REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
+usearch8.0.1623_i86linux32
+usearch6.1.544_i86linux32"
+fi
 MISSING_PROGRAMS=
 for prog in $REQUIRED_PROGRAMS ; do
     echo -n "Checking for ${prog}..."
