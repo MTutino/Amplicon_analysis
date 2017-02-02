@@ -233,7 +233,10 @@ fi;
 
 #Path to Script's directory
 export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
-		
+
+# Get pipeline name in uppercase
+PIPELINE_NAME=$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')
+
 #Check for required programs in current environment
 #Report missing programs and exit if any are not installed/loaded
 REQUIRED_PROGRAMS="cutadapt
@@ -242,15 +245,28 @@ fastqc
 spades
 bioawk
 pandaseq
-usearch8.0.1623_i86linux32
 vsearch113
 ChimeraSlayer.pl
-usearch6.1.544_i86linux32
 print_qiime_config.py
 fasta-splitter.pl
 fasta_number.py
 blastall
 R"
+# Require usearch executables for specific pipelines
+case "$PIPELINE_NAME" in
+    "UPARSE")
+	# UPARSE pipeline needs usearch 8.0.1623
+	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
+usearch8.0.1623_i86linux32"
+	;;
+    "QIIME")
+	# UPARSE pipeline needs usearch 6.1.544
+	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
+usearch6.1.544_i86linux32"
+	;;
+    *)
+	;;
+esac
 MISSING_PROGRAMS=
 for prog in $REQUIRED_PROGRAMS ; do
     echo -n "Checking for ${prog}..."
@@ -480,28 +496,31 @@ set -e
 		fi
 
 ################################################################## SECOND_STEP ###################################################################
-		#Exit if no pipeline specified
-		if [ -z $PIPELINE ]; then
-				usage;
-				exit 1;
-		fi;
-		# If -P is passed as "qiime" the script will use QIIME
-		if [[ "$PIPELINE" == "qiime" ]] || [[ "$PIPELINE" == "QIIME" ]] || [[ "$PIPELINE" == "Qiime" ]]; then		
-				source $DIR/QIIME.sh
-		
-		# If -P is passed as "uparse" the script will use UPARSE (Usearch 8.0)
-		elif [[ "$PIPELINE" == "UPARSE" ]] || [[ "$PIPELINE" == "uparse" ]] || [[ "$PIPELINE" == "Uparse" ]]; then
-				source $DIR/UPARSE.sh
-		
-		# If -P is passed as "vsearch" the script will use vsearch, a freely available programme (64-bit) almost identical to UPARSE		
-		elif  [[ "$PIPELINE" == "VSEARCH" ]] || [[ "$PIPELINE" == "vsearch" ]] || [[ "$PIPELINE" == "Vsearch" ]]; then	
-				source $DIR/VSEARCH.sh
-		
-		else
-				echo " -P $PIPELINE is not a valid option." >> $LOG;
-				usage;
-				exit 1;		
-		fi;
+		# Execute appropriate pipeline based on -P option
+		case "$PIPELINE_NAME" in
+		    "QIIME")
+			source $DIR/QIIME.sh
+			;;
+		    "UPARSE")
+			source $DIR/UPARSE.sh
+			;;
+		    "VSEARCH")
+			source $DIR/VSEARCH.sh
+			;;
+		    *)
+			# Unrecognised pipeline
+			if [ -z $PIPELINE ]; then
+			    #Exit if no pipeline specified
+			    usage
+			    exit 1
+			else
+			    #Invalid pipeline option
+			    echo " -P $PIPELINE is not a valid option." >> $LOG;
+			    usage;
+			    exit 1;
+			fi
+			;;
+		esac
 ################################################################ THIRD_STEP ####################################################################
 		source $DIR/THIRD_STEP.sh
 
