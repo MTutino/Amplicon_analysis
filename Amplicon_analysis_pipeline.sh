@@ -493,15 +493,15 @@ set -e
 				exit 1;
 		fi;
 		# If -P is passed as "qiime" the script will use QIIME
-		if [[ "$PIPELINE" == "qiime" ]] || [[ "$PIPELINE" == "QIIME" ]] || [[ "$PIPELINE" == "Qiime" ]]; then		
+		if [[ "$PIPELINE_NAME" == "QIIME" ]]; then
 				source $DIR/QIIME.sh
 		
 		# If -P is passed as "uparse" the script will use UPARSE (Usearch 8.0)
-		elif [[ "$PIPELINE" == "UPARSE" ]] || [[ "$PIPELINE" == "uparse" ]] || [[ "$PIPELINE" == "Uparse" ]]; then
+		elif [[ "$PIPELINE_NAME" == "UPARSE" ]]; then
 				source $DIR/UPARSE.sh
 		
 		# If -P is passed as "vsearch" the script will use vsearch, a freely available programme (64-bit) almost identical to UPARSE		
-		elif  [[ "$PIPELINE" == "VSEARCH" ]] || [[ "$PIPELINE" == "vsearch" ]] || [[ "$PIPELINE" == "Vsearch" ]]; then	
+		elif  [[ "$PIPELINE_NAME" == "VSEARCH" ]]; then
 				source $DIR/VSEARCH.sh
 		
 		else
