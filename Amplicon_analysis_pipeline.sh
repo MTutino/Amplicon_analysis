@@ -487,28 +487,31 @@ set -e
 		fi
 
 ################################################################## SECOND_STEP ###################################################################
-		#Exit if no pipeline specified
-		if [ -z $PIPELINE ]; then
-				usage;
-				exit 1;
-		fi;
-		# If -P is passed as "qiime" the script will use QIIME
-		if [[ "$PIPELINE_NAME" == "QIIME" ]]; then
-				source $DIR/QIIME.sh
-		
-		# If -P is passed as "uparse" the script will use UPARSE (Usearch 8.0)
-		elif [[ "$PIPELINE_NAME" == "UPARSE" ]]; then
-				source $DIR/UPARSE.sh
-		
-		# If -P is passed as "vsearch" the script will use vsearch, a freely available programme (64-bit) almost identical to UPARSE		
-		elif  [[ "$PIPELINE_NAME" == "VSEARCH" ]]; then
-				source $DIR/VSEARCH.sh
-		
-		else
-				echo " -P $PIPELINE is not a valid option." >> $LOG;
-				usage;
-				exit 1;		
-		fi;
+		# Execute appropriate pipeline based on -P option
+		case "$PIPELINE_NAME" in
+		    "QIIME")
+			source $DIR/QIIME.sh
+			;;
+		    "UPARSE")
+			source $DIR/UPARSE.sh
+			;;
+		    "VSEARCH")
+			source $DIR/VSEARCH.sh
+			;;
+		    *)
+			# Unrecognised pipeline
+			if [ -z $PIPELINE ]; then
+			    #Exit if no pipeline specified
+			    usage
+			    exit 1
+			else
+			    #Invalid pipeline option
+			    echo " -P $PIPELINE is not a valid option." >> $LOG;
+			    usage;
+			    exit 1;
+			fi
+			;;
+		esac
 ################################################################ THIRD_STEP ####################################################################
 		source $DIR/THIRD_STEP.sh
 
