@@ -233,7 +233,10 @@ fi;
 
 #Path to Script's directory
 export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
-		
+
+# Get pipeline name in uppercase
+PIPELINE_NAME=$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')
+
 #Check for required programs in current environment
 #Report missing programs and exit if any are not installed/loaded
 REQUIRED_PROGRAMS="cutadapt
@@ -250,7 +253,7 @@ fasta_number.py
 blastall
 R"
 # Add usearch executables if using UPARSE pipeline
-if [[ "$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')" == "UPARSE" ]] ; then
+if [[ "$PIPELINE_NAME" == "UPARSE" ]] ; then
     REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
 usearch8.0.1623_i86linux32
 usearch6.1.544_i86linux32"
