@@ -252,12 +252,21 @@ fasta-splitter.pl
 fasta_number.py
 blastall
 R"
-# Add usearch executables if using UPARSE pipeline
-if [[ "$PIPELINE_NAME" == "UPARSE" ]] ; then
-    REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
-usearch8.0.1623_i86linux32
+# Require usearch executables for specific pipelines
+case "$PIPELINE_NAME" in
+    "UPARSE")
+	# UPARSE pipeline needs usearch 8.0.1623
+	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
+usearch8.0.1623_i86linux32"
+	;;
+    "QIIME")
+	# UPARSE pipeline needs usearch 6.1.544
+	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
 usearch6.1.544_i86linux32"
-fi
+	;;
+    *)
+	;;
+esac
 MISSING_PROGRAMS=
 for prog in $REQUIRED_PROGRAMS ; do
     echo -n "Checking for ${prog}..."
