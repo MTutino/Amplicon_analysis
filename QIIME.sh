@@ -13,6 +13,8 @@ else
 		awk -v k=$REF_DATA_PATH '{if (NR==12) $0="pynast_template_alignment_fp "k"/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna"} {if (NR==23) $0="assign_taxonomy_reference_seqs_fp "k"/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna"} {if (NR==24) $0="assign_taxonomy_id_to_taxonomy_fp "k"/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt"} {print}' $DIR/Config_QIIME/.qiime_config > ~/.qiime_config;
 fi;
 				
+# Fix the path to the qiime_scripts_dir in the QIIME config file
+sed -i 's,\(qiime_scripts_dir\t\).*,\1'$(dirname $(which print_qiime_config.py))',g' ~/.qiime_config
 
 #Lets call the function to check the dimension of multiplexed/multiplexed_linearized.fasta files and store it in a variable
 check_dimension
