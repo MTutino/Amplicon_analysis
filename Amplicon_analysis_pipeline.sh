@@ -289,11 +289,9 @@ if [[ -z $STEP3 ]]; then
 		#Depending on the size of your file, less than 22GB might not be enought	
 		if [ -z "$NSLOTS" ]; then
 				export NSLOTS=$(nproc);
-				TOT_RAM=$(echo $(($(grep MemTotal /proc/meminfo | awk '{print $2}')/1024)));
-				RAM_PER_CORE=$(($TOT_RAM/$NSLOTS));
-		else
-				RAM_PER_CORE="4000";
 		fi;
+		TOT_RAM=$(echo $(($(grep MemTotal /proc/meminfo | awk '{print $2}')/1024)));
+		RAM_PER_CORE=$(($TOT_RAM/$NSLOTS));
 		
 		if [ $(($RAM_PER_CORE*$NSLOTS)) -lt 22000 ] && [[ -n $SILVA ]]; then
 				echo -e "You need at least 22 gigabytes to use Silva\n The script will use GreenGenes instead\n At the end of the analysis, launch the script again with more cores." >> $LOG
