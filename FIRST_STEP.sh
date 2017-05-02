@@ -100,12 +100,13 @@
 	
 		# Pandaseq
 		echo "Pandaseq version 2.8. Started at $(date|awk '{print $4}')" >> $LOG;
-
+		
 		for i in $(ls -d *|sed 's/\///g' 2> /dev/null);do 
 				R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
 				if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]];then  
-					awk '/^@M01070/{$0=$0" 1:N:0:GGACTCCTGTAAGGAG"}1' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R1_*.cor.fastq > /tmp/$(basename ${i})"_forward.fastq";
-					awk '/^@M01070/{$0=$0" 2:N:0:GGACTCCTGTAAGGAG"}1' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R2_*.cor.fastq > /tmp/$(basename ${i})"_reverse.fastq";
+					MiSeq_ID=$(echo $(awk -F ':' 'NR==1 {print $1}' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R1_*.cor.fastq))
+					awk '/^'"$MiSeq_ID"'/{$0=$0" 1:N:0:GGACTCCTGTAAGGAG"}1' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R1_*.cor.fastq > /tmp/$(basename ${i})"_forward.fastq";
+					awk '/^'"$MiSeq_ID"'/{$0=$0" 2:N:0:GGACTCCTGTAAGGAG"}1' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R2_*.cor.fastq > /tmp/$(basename ${i})"_reverse.fastq";
 					set -e;
 					pandaseq -f /tmp/$(basename ${i})"_forward.fastq" -r /tmp/$(basename ${i})"_reverse.fastq" -N -l $LENGTH -B -d bfsrk -o $OVERLAP > $i/$(basename ${i})".overlap.fasta" -g $i/pandaseq_log.txt; 
 					set +e;

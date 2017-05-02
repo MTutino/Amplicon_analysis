@@ -6,17 +6,22 @@ echo -e "Vsearch pipeline started at $(date|awk '{print $4}')\nVsearch version 1
 		
 # Set a variable to give a short name for the VSEARCH binary
 VSEARCH=$(which vsearch113);
+
+# Set up a temporary file to capture the stderr output from the
+# Vsearch steps of interest, using the idiom 'CMD 2> >(tee -a FILE >&2)'
+# (see e.g. http://stackoverflow.com/a/692407/579925)
+VSEARCH_STDERR=$(mktemp --tmpdir=$(pwd) --suffix=".vsearch")
 	
 mkdir -p Multiplexed_files/Vsearch_pipeline ;
 # Dereplication
 echo "--derep_fulllength (dereplicate and discard singletons) $(date|awk '{print $4}')" >> $LOG;
-$VSEARCH --derep_fulllength Multiplexed_files/multiplexed_linearized.fasta --output Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2.fasta --sizeout --minuniquesize 2;
-SINGLETONS=$(grep "uniques written" *.e$JOB_ID);
+$VSEARCH --derep_fulllength Multiplexed_files/multiplexed_linearized.fasta --output Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2.fasta --sizeout --minuniquesize 2 2> >(tee $VSEARCH_STDERR >&2);
+SINGLETONS=$(grep "uniques written" $VSEARCH_STDERR);
 echo $SINGLETONS|awk '{print "Singletons discarded "$7" ("$4" reads)"}'|sed 's/(//;s/)//' >> $LOG;
 				
 # De novo chimera removal
 echo "--uchime_denovo $(date|awk '{print $4}')" >> $LOG;
-$VSEARCH --uchime_denovo Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2.fasta --nonchimeras Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_DNchimerafiltered.fasta;
+$VSEARCH --uchime_denovo Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2.fasta --nonchimeras Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_DNchimerafiltered.fasta 2> >(tee -a $VSEARCH_STDERR >&2);
 
 # cluster OTUs
 echo "--cluster_fast $(date|awk '{print $4}')" >> $LOG;
@@ -24,8 +29,8 @@ $VSEARCH --cluster_size Multiplexed_files/Vsearch_pipeline/multiplexed_linearize
 				
 # Reference chimera removal
 echo -e "--uchime_ref $(date|awk '{print $4}')\nReference: RDPClassifier_16S_trainsetNo14" >> $LOG;
-$VSEARCH --uchime_ref Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_DNchimerafiltered.fasta --db $CHIM  --nonchimeras Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta;				
-CHIMERAS=$(grep -E Found\|suspicious *.e$JOB_ID);
+$VSEARCH --uchime_ref Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_DNchimerafiltered.fasta --db $CHIM  --nonchimeras Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta 2> >(tee -a $VSEARCH_STDERR >&2);				
+CHIMERAS=$(grep -E Found\|suspicious $VSEARCH_STDERR);
 echo $CHIMERAS|awk '{print "De novo chimera removal found "$3" chimeras ["$2" seqs], "$6" non chimeras ["$5" seqs], suspicious candidates "$10" ["$9" seqs]\nClosed-reference chimera removal found "$18" chimeras ["$17" OTUs], "$21" non chimeras ["$20" OTUs], suspicious candidates "$25" ["$24" OTUs]"}'|sed 's/(//g;s/)//g' >> $LOG;
 				
 # Label OTUs 

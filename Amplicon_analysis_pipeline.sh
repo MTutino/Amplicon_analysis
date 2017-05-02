@@ -55,6 +55,7 @@ OPTIONS:
    -1 (One)     Use this option "-1 suppress" to skip the QC step
    -P	   Use this option to decide which pipeline to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
    -S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
+   -r      Path to the directory with the reference databases, if not same as the script directory ***OPTIONAL***
 
  *** To run only the third step ***
    -3	   Pass this flag without any argument to run only the third step
@@ -152,9 +153,10 @@ export BIOM=
 export RESULTS_PATH=
 export METATABLE=
 export TREE=
+export REF_DATA_PATH=
 
 #Get the arguments
-while getopts “hg:G:q:l:O:L:1:P:Si:o:m:t:3” OPTION
+while getopts “hg:G:q:l:O:L:1:P:Si:o:m:t:r:3” OPTION
 do
      case $OPTION in
          h)
@@ -203,6 +205,14 @@ do
          t)
              export TREE=$OPTARG
              ;;
+	 r)
+	     if [ ! -d "$OPTARG" ] ; then
+		 echo "Fatal: Non-existent directory '$OPTARG' supplied to -r option" >&2
+		 exit 1
+	     else
+		 export REF_DATA_PATH=$(cd "$OPTARG" && pwd)
+	     fi
+	     ;;
          \?)
              echo "invalid option: $OPTARG" >> $LOG
 			 usage
@@ -223,106 +233,54 @@ fi;
 
 #Path to Script's directory
 export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
-		
-#Read in the list, create a variable for every programme and exit if the programme is not installed/loaded
-LIST=$(echo -e "cutadapt\nsickle\nfastqc\nspades\nbioawk\npandaseq\nusearch8.0.1623_i86linux32\nvsearch113\nChimeraSlayer.pl\nusearch6.1.544_i86linux32\nprint_qiime_config.py\nfasta-splitter.pl\nfasta_number.py\nblastall\nR");
-i=1;
-while read -r programme; do 
-		export PROG_$i="$programme";
-		((++i));
-done <<< "$LIST" ;
 
-#I tried to use a while and a for loops but they did not work with "which"
-PATH_1=$(which $PROG_1);
-if [ -z "$PATH_1" ];then 
-		echo "I could not find $PROG_1";
-		echo "Make sure you can run $PROG_1 inside the working directory";
-		exit 1;
-fi;
-PATH_2=$(which $PROG_2);
-if [ -z "$PATH_2" ];then 
-		echo "I could not find $PROG_2";
-		echo "Make sure you can run $PROG_2 inside the working directory";
-		exit 1;
-fi;
-PATH_3=$(which $PROG_3);
-if [ -z "$PATH_3" ];then 
-		echo "I could not find $PROG_3";
-		echo "Make sure you can run $PROG_3 inside the working directory";
-		exit 1;
-fi;
-PATH_4=$(which $PROG_4);
-if [ -z "$PATH_4" ];then 
-		echo "I could not find $PROG_4";
-		echo "Make sure you can run $PROG_4 inside the working directory";
-		exit 1;
-fi;
-PATH_5=$(which $PROG_5);
-if [ -z "$PATH_5" ];then 
-		echo "I could not find $PROG_5";
-		echo "Make sure you can run $PROG_5 inside the working directory";
-		exit 1;
-fi;
-PATH_6=$(which $PROG_6);
-if [ -z "$PATH_6" ];then 
-		echo "I could not find $PROG_6";
-		echo "Make sure you can run $PR_6 inside the working directory";
-		exit 1;
-fi;
-PATH_7=$(which $PROG_7);
-if [ -z "$PATH_7" ];then 
-		echo "I could not find $PROG_7";
-		echo "Make sure you can run $PROG_7 inside the working directory";
-		exit 1;
-fi;
-PATH_8=$(which $PROG_8);
-if [ -z "$PATH_8" ];then 
-		echo "I could not find $PROG_8";
-		echo "Make sure you can run $PROG_8 inside the working directory";
-		exit 1;
-fi;
-PATH_9=$(which $PROG_9);
-if [ -z "$PATH_9" ];then 
-		echo "I could not find $PROG_9";
-		echo "Make sure you can run $PROG_9 inside the working directory";
-		exit 1;
-fi;
-PATH_10=$(which $PROG_10);
-if [ -z "$PATH_10" ];then 
-		echo "I could not find $PROG_10";
-		echo "Make sure you can run $PROG_10 inside the working directory";
-		exit 1;
-fi;
-PATH_11=$(which $PROG_11);
-if [ -z "$PATH_11" ];then 
-		echo "I could not find $PROG_11";
-		echo "Make sure you can run $PROG_11 inside the working directory";
-		exit 1;
-fi;
-PATH_12=$(which $PROG_12);
-if [ -z "$PATH_12" ];then 
-		echo "I could not find $PROG_12";
-		echo "Make sure you can run $PROG_12 inside the working directory";
-		exit 1;
-fi;
-PATH_13=$(which $PROG_13);
-if [ -z "$PATH_13" ];then 
-		echo "I could not find $PROG_13";
-		echo "Make sure you can run $PROG_13 inside the working directory";
-		exit 1;
-fi;
-PATH_14=$(which $PROG_14);
-if [ -z "$PATH_14" ];then 
-		echo "I could not find $PROG_14";
-		echo "Make sure you can run $PROG_14 inside the working directory";
-		exit 1;
-fi;
-PATH_15=$(which $PROG_15);
-if [ -z "$PATH_15" ];then 
-		echo "I could not find $PROG_15";
-		echo "Make sure you can run $PROG_15 inside the working directory";
-		exit 1;
-fi;
+# Get pipeline name in uppercase
+PIPELINE_NAME=$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')
+
+#Check for required programs in current environment
+#Report missing programs and exit if any are not installed/loaded
+REQUIRED_PROGRAMS="cutadapt
+sickle
+fastqc
+spades
+bioawk
+pandaseq
+vsearch113
+ChimeraSlayer.pl
+print_qiime_config.py
+fasta-splitter.pl
+fasta_number.py
+blastall
+R"
+# Require usearch executables for specific pipelines
+case "$PIPELINE_NAME" in
+    "UPARSE")
+	# UPARSE pipeline needs usearch 8.0.1623
+	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
+usearch8.0.1623_i86linux32"
+	;;
+    "QIIME")
+	# UPARSE pipeline needs usearch 6.1.544
+	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
+usearch6.1.544_i86linux32"
+	;;
+    *)
+	;;
+esac
+MISSING_PROGRAMS=
+for prog in $REQUIRED_PROGRAMS ; do
+    echo -n "Checking for ${prog}..."
+    if [ -z "$(which $prog)" ] ; then
+	echo missing
+	MISSING_PROGRAMS=yes
+    else
+	echo ok
+    fi
+done
+if [ ! -z "$MISSING_PROGRAMS" ] ; then
+    echo "One or more required programs are missing"
+    exit 1
+fi
 
 #If $STEP3 is empty (the argument -3 has not been passed)  then the script will run the entire pipeline
 if [[ -z $STEP3 ]]; then
@@ -331,11 +289,9 @@ if [[ -z $STEP3 ]]; then
 		#Depending on the size of your file, less than 22GB might not be enought	
 		if [ -z "$NSLOTS" ]; then
 				export NSLOTS=$(nproc);
-				TOT_RAM=$(echo $(($(grep MemTotal /proc/meminfo | awk '{print $2}')/1024)));
-				RAM_PER_CORE=$(($TOT_RAM/$NSLOTS));
-		else
-				RAM_PER_CORE="4000";
 		fi;
+		TOT_RAM=$(echo $(($(grep MemTotal /proc/meminfo | awk '{print $2}')/1024)));
+		RAM_PER_CORE=$(($TOT_RAM/$NSLOTS));
 		
 		if [ $(($RAM_PER_CORE*$NSLOTS)) -lt 22000 ] && [[ -n $SILVA ]]; then
 				echo -e "You need at least 22 gigabytes to use Silva\n The script will use GreenGenes instead\n At the end of the analysis, launch the script again with more cores." >> $LOG
@@ -492,6 +448,10 @@ set -e
 				awk 'NR==1 {print ; next} {printf /^>/ ? "\n"$0"\n" : $1} END {print}' Multiplexed_files/multiplexed.fasta > Multiplexed_files/multiplexed_linearized.fasta;
 
 		fi;
+
+		# Reference databases directory
+		export REF_DATA_PATH="${REF_DATA_PATH:-$DIR}"
+		echo "Expecting reference databases under $REF_DATA_PATH"
 	
 		
 	
@@ -499,45 +459,65 @@ set -e
 		if [[ -z $SILVA ]]; then
 				echo "Reference database: GreenGenes 13_8" >> $LOG;
 				#Greengenes
-				export REF="$DIR/gg_13_8_otus/rep_set/97_otus.fasta";
-				export TAX="$DIR/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt";
-				export TREE="$DIR/gg_13_8_otus/trees/97_otus.tree";
-				export ALIGNED="$DIR/gg_13_8_otus/rep_set_aligned/97_otus.fasta";
-				export CORE="$DIR/gg_13_8_otus/rep_set_aligned/97_otus.fasta" ;
-				export CHIM="$DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+				export REF="$REF_DATA_PATH/gg_13_8_otus/rep_set/97_otus.fasta";
+				export TAX="$REF_DATA_PATH/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt";
+				export TREE="$REF_DATA_PATH/gg_13_8_otus/trees/97_otus.tree";
+				export ALIGNED="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta";
+				export CORE="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta" ;
+				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
 		else	
 				echo "Reference database: Silva_119" >> $LOG;
 				#Silva
-				export REF="$DIR/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna";
-				export TAX="$DIR/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt";
-				export TREE="$DIR/Silva/Silva119_release/97_FastTree_trees/Silva_119_rep_set97_aligned_16S_only_pfiltered.tre";
-				export ALIGNED="$DIR/Silva/Silva119_release_aligned_rep_files/97_16S_only/Silva_119_rep_set97_aligned_16S_only.fna";
-				export CORE="$DIR/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
-				export CHIM="$DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+				export REF="$REF_DATA_PATH/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna";
+				export TAX="$REF_DATA_PATH/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt";
+				export TREE="$REF_DATA_PATH/Silva/Silva119_release/97_FastTree_trees/Silva_119_rep_set97_aligned_16S_only_pfiltered.tre";
+				export ALIGNED="$REF_DATA_PATH/Silva/Silva119_release_aligned_rep_files/97_16S_only/Silva_119_rep_set97_aligned_16S_only.fna";
+				export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
+				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
 		fi;
+		# Check that the reference data actually exists
+		echo "Checking for reference databases:"
+		MISSING_DATABASES=
+		for reference_db in $REF $TAX $TREE $ALIGNED $CORE $CHIM ; do
+		    echo -n "${reference_db}..."
+		    if [ ! -e $reference_db ] ; then
+			echo missing
+			MISSING_DATABASES=yes
+		    else
+			echo ok
+		    fi
+		done
+		if [ ! -z "$MISSING_DATABASES" ] ; then
+		    echo "One or more reference databases are missing" >&2
+		    exit 1
+		fi
+
 ################################################################## SECOND_STEP ###################################################################
-		#Exit if no pipeline specified
-		if [ -z $PIPELINE ]; then
-				usage;
-				exit 1;
-		fi;
-		# If -P is passed as "qiime" the script will use QIIME
-		if [[ "$PIPELINE" == "qiime" ]] || [[ "$PIPELINE" == "QIIME" ]] || [[ "$PIPELINE" == "Qiime" ]]; then		
-				source $DIR/QIIME.sh
-		
-		# If -P is passed as "uparse" the script will use UPARSE (Usearch 8.0)
-		elif [[ "$PIPELINE" == "UPARSE" ]] || [[ "$PIPELINE" == "uparse" ]] || [[ "$PIPELINE" == "Uparse" ]]; then
-				source $DIR/UPARSE.sh
-		
-		# If -P is passed as "vsearch" the script will use vsearch, a freely available programme (64-bit) almost identical to UPARSE		
-		elif  [[ "$PIPELINE" == "VSEARCH" ]] || [[ "$PIPELINE" == "vsearch" ]] || [[ "$PIPELINE" == "Vsearch" ]]; then	
-				source $DIR/VSEARCH.sh
-		
-		else
-				echo " -P $PIPELINE is not a valid option." >> $LOG;
-				usage;
-				exit 1;		
-		fi;
+		# Execute appropriate pipeline based on -P option
+		case "$PIPELINE_NAME" in
+		    "QIIME")
+			source $DIR/QIIME.sh
+			;;
+		    "UPARSE")
+			source $DIR/UPARSE.sh
+			;;
+		    "VSEARCH")
+			source $DIR/VSEARCH.sh
+			;;
+		    *)
+			# Unrecognised pipeline
+			if [ -z $PIPELINE ]; then
+			    #Exit if no pipeline specified
+			    usage
+			    exit 1
+			else
+			    #Invalid pipeline option
+			    echo " -P $PIPELINE is not a valid option." >> $LOG;
+			    usage;
+			    exit 1;
+			fi
+			;;
+		esac
 ################################################################ THIRD_STEP ####################################################################
 		source $DIR/THIRD_STEP.sh
 
