@@ -465,8 +465,10 @@ if [[ -z $STEP3 ]]; then
 		# Check if multiplexed and multiplexed_linearized.fasta already exist and if their size is not zero
 		FILENAME1="Multiplexed_files/multiplexed.fasta";
 		FILENAME2="Multiplexed_files/multiplexed_linearized.fasta";
-		if [ -f $FILENAME1 ] || [ -s $FILENAME1 ]; then
-				echo "Multiplexed.fasta already exists." >> $LOG;
+
+		if [ -s $FILENAME1 ]; then
+
+				echo "Multiplexed.fasta already exists. I will go straight to step 2." >> $LOG;
 		else
 				#The variable will contain the first and second column of metatable file (folder name and barcode)
 				BARCODE=$(awk '{if (NR==1) next;print $1"\t"$2}' $METATABLE_1);
@@ -485,16 +487,13 @@ set -e
 								oldnamemod=
 						done <<< "$BARCODE";
 				done;
-		fi;
-	
-		
-		if [ -f $FILENAME2 ] || [ -s $FILENAME2 ]; then
-				echo "Multiplexed_linearized.fasta already exists. I will go straight to step 2." >> $LOG;
-		else
+
 				# Linearize multiplexed.fasta
 				awk 'NR==1 {print ; next} {printf /^>/ ? "\n"$0"\n" : $1} END {print}' Multiplexed_files/multiplexed.fasta > Multiplexed_files/multiplexed_linearized.fasta;
 
 		fi;
+	
+		
 	
 		# Define the path for every reference we are going to use. Not all of them are actually used.
 		if [[ -z $SILVA ]]; then
