@@ -156,7 +156,7 @@ export TREE=
 export REF_DATA_PATH=
 
 #Get the arguments
-while getopts “hg:G:q:l:O:L:1:P:Si:o:m:t:r:3” OPTION
+while getopts "hg:G:q:l:O:L:1:P:Si:o:m:t:r:3" OPTION
 do
      case $OPTION in
          h)
