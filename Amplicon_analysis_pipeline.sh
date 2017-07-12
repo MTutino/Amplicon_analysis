@@ -49,7 +49,7 @@ OPTIONS:
    -g      Forward primer (Cutadapt) ***REQUIRED IF USING CUTADAPT. IF IT IS NOT PASSED, CUTADAPT WILL BE DISABLED***
    -G      Reverse primer (Cutadapt) ***REQUIRED IF USING CUTADAPT.IF IT IS NOT PASSED, CUTADAPT WILL BE DISABLED***
    -q      Phred score threshold below which the reads will be trimmed [default 20] (Sickle) ***OPTIONAL*** 
-   -l (Lowercase "L")	   Length of the sliding Window in bp [default 10] (Sickle) ***OPTIONAL***
+   -l (Lowercase "L")	  Threshold to keep a read based on length after trimming [default 10] (Sickle) ***OPTIONAL***
    -O (Uppercase "O")     Minimum overlap in bp between forward and reverse reads [default 10] (Pandaseq) ***OPTIONAL***
    -L      Minimum length in bp for a sequence to be kept after overlapping [default 380] (Pandaseq) ***OPTIONAL***
    -1 (One)     Use this option "-1 suppress" to skip the QC step
@@ -314,7 +314,7 @@ if [[ -z $STEP3 ]]; then
 		fi;
 
 		if [[ -z $LENGTH ]]; then
-				export LENGTH="380" ;
+				export LENGTH="200" ;
 		fi;
 
 		if [[ -z $SILVA ]]; then
