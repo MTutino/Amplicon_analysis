@@ -135,6 +135,8 @@ for i in $(ls -d */ 2> /dev/null); do
 					
 						if [[ -z $NO_CUTADAPT ]]; then
 								echo -ne '\t'$(($(wc -l < Cutadapt/$(basename ${i})"_R1_trimmed.fastq")/4));
+						else
+								echo -ne '\t'
 						fi;	
 					
 						echo -ne '\t'$(($(wc -l < Cutadapt_Sickle/Q$PHRED/*_R1_*cutsick.fastq)/4));
