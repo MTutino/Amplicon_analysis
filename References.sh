@@ -9,7 +9,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
 mkdir -p $DIR/gg_13_8_otus;
 
 #Check if directory is empty. if empty, download the reference 
-if [[ -s $DIR/gg_13_8_otus ]];
+if [[  "$(ls -A $DIR/gg_13_8_otus)" ]];
 then
 	echo "gg_13_8_otus folder not empty"
 else
@@ -31,7 +31,7 @@ fi
 mkdir -p $DIR/Silva;
 
 #Check if directory is empty. if empty, download the reference
-if [[ -s $DIR/Silva ]];
+if [[  "$(ls -A $DIR/Silva)" ]];
 then
 	echo "Silva folder not empty"
 else
@@ -54,7 +54,7 @@ fi
 mkdir -p $DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata;
 
 #Check if directory is empty. if empty, download the reference
-if [[ -s $DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata ]];
+if [[  "$(ls -A $DIR/RDPClassifier_16S_trainsetNo14_rawtrainingdata)" ]];
 then
 	echo "RDPClassifier_16S_trainsetNo14_rawtrainingdata folder not empty"
 
