@@ -129,10 +129,15 @@ echo "QIIME pipeline finished at $(date|awk '{print $4}')" >> $LOG;
 		
 mkdir -p RESULTS/ ;
 				
-if [[ -z $SILVA ]]; then			
-	mkdir -p RESULTS/QIIME_gg ;
-	export RESULTS_PATH=RESULTS/QIIME_gg ;			
-else			
+if [[ -n $SILVA ]]; then			
 	mkdir -p RESULTS/QIIME_silva ;
-	export RESULTS_PATH=RESULTS/QIIME_silva ;			
+	export RESULTS_PATH=RESULTS/QIIME_silva ;
+	
+elif [[ -n $HOMD ]];then
+	mkdir -p RESULTS/QIIME_homd ;
+	export RESULTS_PATH=RESULTS/QIIME_homd ;
+
+else			
+	mkdir -p RESULTS/QIIME_gg ;
+	export RESULTS_PATH=RESULTS/QIIME_gg ;				
 fi;
