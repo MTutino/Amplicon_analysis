@@ -87,11 +87,14 @@ echo "Vsearch pipeline finished at $(date|awk '{print $4}')" >> $LOG;
 		
 #Lets create the directory for the outputs in the third step
 mkdir -p RESULTS/ ;
-				
-if [[ -z $SILVA ]]; then
-		mkdir -p RESULTS/Vsearch_gg ;
-		export RESULTS_PATH="RESULTS/Vsearch_gg" ;			
-else			
+
+if [[ -n $SILVA ]]; then
 		mkdir -p RESULTS/Vsearch_silva ;
-		export RESULTS_PATH="RESULTS/Vsearch_silva" ;		
+		export RESULTS_PATH="RESULTS/Vsearch_silva" ;
+elif [[ -n $HOMD ]]; then
+		mkdir -p RESULTS/Vsearch_homd ;
+		export RESULTS_PATH="RESULTS/Vsearch_homd" ;		
+else			
+		mkdir -p RESULTS/Vsearch_gg ;
+		export RESULTS_PATH="RESULTS/Vsearch_gg" ;				
 fi;
