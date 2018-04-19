@@ -7,12 +7,19 @@ echo -e "QIIME pipeline started at $(date|awk '{print $4}') \nQIIME version 1.8.
 # QIIME pipeline with Usearch61
 
 #Lets define the configuration of QIIME		
-if [[ -z $SILVA ]]; then
-		awk -v k=$REF_DATA_PATH '{if (NR==12) $0="pynast_template_alignment_fp "k"/gg_13_8_otus/rep_set_aligned/97_otus.fasta"} {if (NR==23) $0="assign_taxonomy_reference_seqs_fp "k"/gg_13_8_otus/rep_set/97_otus.fasta"} {if (NR==24) $0="assign_taxonomy_id_to_taxonomy_fp "k"/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt"} {print}' $DIR/Config_QIIME/.qiime_config > ~/.qiime_config ;
+if [[ -n $SILVA ]]; then
+		awk -v k=$DIR '{if (NR==12) $0="pynast_template_alignment_fp "k"/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna"} {if (NR==23) $0="assign_taxonomy_reference_seqs_fp "k"/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna"} {if (NR==24) $0="assign_taxonomy_id_to_taxonomy_fp "k"/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt"} {print}' $DIR/Config_QIIME/.qiime_config > ~/.qiime_config;
+
+elif [[ -n $HOMD ]]; then		
+		awk -v k=$DIR '{if (NR==12) $0="pynast_template_alignment_fp "k"/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.aligned.fasta"} {if (NR==23) $0="assign_taxonomy_reference_seqs_fp "k"/HOMD/HOMD_16S_rRNA_RefSeq_V15.1_ModHeader.fasta"} {if (NR==24) $0="assign_taxonomy_id_to_taxonomy_fp "k"/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.qiime.taxonomy"} {print}' $DIR/Config_QIIME/.qiime_config > ~/.qiime_config ;
+
+
 else	
-		awk -v k=$REF_DATA_PATH '{if (NR==12) $0="pynast_template_alignment_fp "k"/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna"} {if (NR==23) $0="assign_taxonomy_reference_seqs_fp "k"/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna"} {if (NR==24) $0="assign_taxonomy_id_to_taxonomy_fp "k"/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt"} {print}' $DIR/Config_QIIME/.qiime_config > ~/.qiime_config;
+
+		awk -v k=$DIR '{if (NR==12) $0="pynast_template_alignment_fp "k"/gg_13_8_otus/rep_set_aligned/97_otus.fasta"} {if (NR==23) $0="assign_taxonomy_reference_seqs_fp "k"/gg_13_8_otus/rep_set/97_otus.fasta"} {if (NR==24) $0="assign_taxonomy_id_to_taxonomy_fp "k"/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt"} {print}' $DIR/Config_QIIME/.qiime_config > ~/.qiime_config ;
+		
 fi;
-				
+
 # Fix the path to the qiime_scripts_dir in the QIIME config file
 sed -i 's,\(qiime_scripts_dir\t\).*,\1'$(dirname $(which print_qiime_config.py))',g' ~/.qiime_config
 
@@ -133,7 +140,7 @@ if [[ -n $SILVA ]]; then
 	mkdir -p RESULTS/QIIME_silva ;
 	export RESULTS_PATH=RESULTS/QIIME_silva ;
 	
-elif [[ -n $HOMD ]];then
+elif [[ -n $HOMD ]]; then
 	mkdir -p RESULTS/QIIME_homd ;
 	export RESULTS_PATH=RESULTS/QIIME_homd ;
 
