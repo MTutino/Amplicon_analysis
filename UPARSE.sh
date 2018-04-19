@@ -118,11 +118,15 @@ echo "UPARSE pipeline finished at $(date|awk '{print $4}')" >> $LOG;
 		
 #Lets create the directory for the outputs in the third step
 mkdir -p RESULTS/ ;
-				
-if [[ -z $SILVA ]]; then			
-		mkdir -p RESULTS/Uparse_gg ;
-		export RESULTS_PATH=RESULTS/Uparse_gg ;			
-else			
+
+if [[ -n $SILVA ]]; then
 		mkdir -p RESULTS/Uparse_silva ;
-		export RESULTS_PATH=RESULTS/Uparse_silva ;			
+		export RESULTS_PATH="RESULTS/Uparse_silva" ;
+elif [[ -n $HOMD ]]; then
+		mkdir -p RESULTS/Uparse_homd ;
+		export RESULTS_PATH="RESULTS/Uparse_homd" ;		
+else			
+		mkdir -p RESULTS/Uparse_gg ;
+		export RESULTS_PATH="RESULTS/Uparse_gg" ;				
 fi;
+
