@@ -55,6 +55,7 @@ OPTIONS:
    -1 (One)     Use this option "-1 suppress" to skip the QC step
    -P	   Use this option to decide which pipeline to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
    -S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
+   -H	   Human Oral Microbiome Database
    -r      Path to the directory with the reference databases, if not same as the script directory ***OPTIONAL***
 
  *** To run only the third step ***
@@ -147,6 +148,7 @@ export STEP1=
 export PIPELINE=
 export NO_CUTADAPT=
 export SILVA=
+export HOMD=
 export MEMORY=
 export STEP3=
 export BIOM=
@@ -156,7 +158,7 @@ export TREE=
 export REF_DATA_PATH=
 
 #Get the arguments
-while getopts "hg:G:q:l:O:L:1:P:Si:o:m:t:r:3" OPTION
+while getopts "hg:G:q:l:O:L:1:P:Si:o:m:t:r:3H" OPTION
 do
      case $OPTION in
          h)
@@ -190,6 +192,9 @@ do
 		 S)	 
 			 export SILVA=silva
 			 ;;
+		 H)
+		export HOMD=homd
+		;;
 		 3)
              export STEP3=ONLY_LAST_STEP
              ;;
@@ -453,19 +458,8 @@ set -e
 		export REF_DATA_PATH="${REF_DATA_PATH:-$DIR}"
 		echo "Expecting reference databases under $REF_DATA_PATH"
 	
-		
-	
-		# Define the path for every reference we are going to use. Not all of them are actually used.
-		if [[ -z $SILVA ]]; then
-				echo "Reference database: GreenGenes 13_8" >> $LOG;
-				#Greengenes
-				export REF="$REF_DATA_PATH/gg_13_8_otus/rep_set/97_otus.fasta";
-				export TAX="$REF_DATA_PATH/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt";
-				export TREE="$REF_DATA_PATH/gg_13_8_otus/trees/97_otus.tree";
-				export ALIGNED="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta";
-				export CORE="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta" ;
-				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
-		else	
+		if [[ -n $SILVA ]]; then 
+
 				echo "Reference database: Silva_119" >> $LOG;
 				#Silva
 				export REF="$REF_DATA_PATH/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna";
@@ -474,7 +468,35 @@ set -e
 				export ALIGNED="$REF_DATA_PATH/Silva/Silva119_release_aligned_rep_files/97_16S_only/Silva_119_rep_set97_aligned_16S_only.fna";
 				export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
 				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+
+		elif [[ -n $HOMD ]];then
+
+				echo "Reference database: HOMD_15.1" >> $LOG;
+				#HOMD
+				export REF="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1_ModHeader.fasta";
+				export TAX="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.qiime.taxonomy";
+				#export TREE="$REF_DATA_PATH/";
+				#export ALIGNED="$REF_DATA_PATH/";
+				export CORE="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.aligned.fasta";
+				#export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
+				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+
+
+
+		else
+				echo "Reference database: GreenGenes 13_8" >> $LOG;
+				#Greengenes
+				export REF="$REF_DATA_PATH/gg_13_8_otus/rep_set/97_otus.fasta";
+				export TAX="$REF_DATA_PATH/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt";
+				export TREE="$REF_DATA_PATH/gg_13_8_otus/trees/97_otus.tree";
+				export ALIGNED="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta";
+				export CORE="$REF_DATA_PATH/gg_13_8_otus/rep_set_aligned/97_otus.fasta" ;
+				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta"
+			
+				
 		fi;
+	
+		
 		# Check that the reference data actually exists
 		echo "Checking for reference databases:"
 		MISSING_DATABASES=
