@@ -11,10 +11,10 @@
 				echo "Cutadapt version 1.8.1. Started at $(date|awk '{print $4}')" >> $LOG;
 			set +e
 				for i in $(ls -d *|sed 's/\///g' 2> /dev/null);do 
-						R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
-						R2=$(ls $i/*_R2_*.fastq* 2> /dev/null);
+						R1=$(ls $i/*_R1*.fastq* 2> /dev/null); 
+						R2=$(ls $i/*_R2*.fastq* 2> /dev/null);
 
-						if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]];then 
+						if [[ $R1 == *_R1*.fastq.gz ]] || [[ $R1 == *_R1*.fastq ]];then 
 								mkdir -p $i/Cutadapt;
 								set -e;
 								cutadapt -e 0.15 -g ^$FORWARD -G ^$REVERSE --untrimmed-output $i/Cutadapt/$(basename ${i})"_R1_untrimmed.fastq" --untrimmed-paired-output $i/Cutadapt/$(basename ${i})"_R2_untrimmed.fastq" -o $i/Cutadapt/$(basename ${i})"_R1_trimmed.fastq" -p $i/Cutadapt/$(basename ${i})"_R2_trimmed.fastq" $R1 $R2;
@@ -31,8 +31,8 @@
 		echo "Sickle version 1.33. Started at $(date|awk '{print $4}')" >> $LOG;
 		if [[ -z $NO_CUTADAPT ]]; then					
 				for i in $(ls -d *|sed 's/\///g' 2> /dev/null);do 
-						R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
-						if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]]; then 
+						R1=$(ls $i/*_R1*.fastq* 2> /dev/null); 
+						if [[ $R1 == *_R1*.fastq.gz ]] || [[ $R1 == *_R1*.fastq ]]; then 
 								mkdir -p $i/Cutadapt_Sickle/;
 								mkdir -p $i/Cutadapt_Sickle/Q$PHRED/;
 								set -e;
@@ -45,12 +45,12 @@
 		else
 				set +e;
 				for i in $(ls -d *|sed 's/\///g' 2> /dev/null); do 
-						R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
-						if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]]; then
+						R1=$(ls $i/*_R1*.fastq* 2> /dev/null); 
+						if [[ $R1 == *_R1*.fastq.gz ]] || [[ $R1 == *_R1*.fastq ]]; then
 								mkdir -p $i/Cutadapt_Sickle/;
 								mkdir -p $i/Cutadapt_Sickle/Q$PHRED/; 
 								set -e;
-								sickle pe -f $i/*_R1_*.fastq* -r $i/*_R2_*.fastq* -o $i/Cutadapt_Sickle/Q$PHRED/$(basename ${i})"_R1_cutsick.fastq" -p $i/Cutadapt_Sickle/Q$PHRED/$(basename ${i})"_R2_cutsick.fastq" -s $i/Cutadapt_Sickle/Q$PHRED/$(basename ${i})"_singlet.fastq" -x -q $PHRED -l $WINDOW -t "sanger"; 
+								sickle pe -f $i/*_R1*.fastq* -r $i/*_R2*.fastq* -o $i/Cutadapt_Sickle/Q$PHRED/$(basename ${i})"_R1_cutsick.fastq" -p $i/Cutadapt_Sickle/Q$PHRED/$(basename ${i})"_R2_cutsick.fastq" -s $i/Cutadapt_Sickle/Q$PHRED/$(basename ${i})"_singlet.fastq" -x -q $PHRED -l $WINDOW -t "sanger"; 
 								set +e;
 						fi;
 				done;
@@ -60,8 +60,8 @@
 		echo "FastQC version 0.11.3. Started at $(date|awk '{print $4}')" >> $LOG;
 
 		for i in $(ls -d *|sed 's/\///g' 2> /dev/null); do 
-				R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
-				if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]]; then 
+				R1=$(ls $i/*_R1*.fastq* 2> /dev/null); 
+				if [[ $R1 == *_R1*.fastq.gz ]] || [[ $R1 == *_R1*.fastq ]]; then 
 						mkdir -p $i/FastQC/;
 						mkdir -p $i/FastQC/Raw;
 						mkdir -p $i/FastQC/cutdapt_sickle/;
@@ -87,8 +87,8 @@
 		echo "SPADes version 3.5.0. Started at $(date|awk '{print $4}')" >> $LOG;
 
 		for i in $(ls -d *|sed 's/\///g' 2> /dev/null);do 
-				R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
-				if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]];then
+				R1=$(ls $i/*_R1*.fastq* 2> /dev/null); 
+				if [[ $R1 == *_R1*.fastq.gz ]] || [[ $R1 == *_R1*.fastq ]];then
 						cd $i/Cutadapt_Sickle/Q$PHRED/; 
 						set -e
 						spades.py -1 *_R1_*cutsick.fastq -2 *_R2_*cutsick.fastq -o . --only-error-correction --careful --disable-gzip-output 2> /dev/null; 
@@ -102,8 +102,8 @@
 		echo "Pandaseq version 2.8. Started at $(date|awk '{print $4}')" >> $LOG;
 		
 		for i in $(ls -d *|sed 's/\///g' 2> /dev/null);do 
-				R1=$(ls $i/*_R1_*.fastq* 2> /dev/null); 
-				if [[ $R1 == *_R1_*.fastq.gz ]] || [[ $R1 == *_R1_*.fastq ]];then  
+				R1=$(ls $i/*_R1*.fastq* 2> /dev/null); 
+				if [[ $R1 == *_R1*.fastq.gz ]] || [[ $R1 == *_R1*.fastq ]];then  
 					MiSeq_ID=$(echo $(awk -F ':' 'NR==1 {print $1}' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R1_*.cor.fastq))
 					awk '/^'"$MiSeq_ID"'/{$0=$0" 1:N:0:GGACTCCTGTAAGGAG"}1' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R1_*.cor.fastq > /tmp/$(basename ${i})"_forward.fastq";
 					awk '/^'"$MiSeq_ID"'/{$0=$0" 2:N:0:GGACTCCTGTAAGGAG"}1' $i/Cutadapt_Sickle/Q$PHRED/corrected/*_R2_*.cor.fastq > /tmp/$(basename ${i})"_reverse.fastq";
@@ -127,10 +127,10 @@ for i in $(ls -d */ 2> /dev/null); do
 				cd $i; 
 				if [ -s $(basename ${i})".overlap.fasta" ]; then 
 						(echo -ne "\n"$(basename ${i}); 
-						if [ *_R1_*.fastq* == *_R1_*.fastq.gz ]; then
-								echo -ne '\t'$(($(zcat *_R1_*.fastq.gz| wc -l)/4));
+						if [ *_R1*.fastq* == *_R1*.fastq.gz ]; then
+								echo -ne '\t'$(($(zcat *_R1*.fastq.gz| wc -l)/4));
 						else
-								echo -ne '\t'$(($(cat *_R1_*.fastq| wc -l)/4));
+								echo -ne '\t'$(($(cat *_R1*.fastq| wc -l)/4));
 						fi;
 					
 						if [[ -z $NO_CUTADAPT ]]; then
@@ -160,12 +160,12 @@ for i in $(ls -d */ 2> /dev/null); do
 		for i in $(ls -d */ 2> /dev/null); do
 				set -e;
 				if [[ -s $i/$(basename ${i})".overlap.fasta" ]]; then
-						if [ $i/*_R1_*.fastq* == $i/*_R1_*.fastq.gz ]; then
-								zcat $i/*_R1_*.fastq.gz >> Stats/total_reads_R1.fastq;
-								zcat $i/*_R2_*.fastq.gz >> Stats/total_reads_R2.fastq;
+						if [ $i/*_R1*.fastq* == $i/*_R1*.fastq.gz ]; then
+								zcat $i/*_R1*.fastq.gz >> Stats/total_reads_R1.fastq;
+								zcat $i/*_R2*.fastq.gz >> Stats/total_reads_R2.fastq;
 						else
-								cat $i/*_R1_*.fastq >> Stats/total_reads_R1.fastq;
-								cat $i/*_R2_*.fastq >> Stats/total_reads_R2.fastq;
+								cat $i/*_R1*.fastq >> Stats/total_reads_R1.fastq;
+								cat $i/*_R2*.fastq >> Stats/total_reads_R2.fastq;
 						fi;
 						cat $i/Cutadapt_Sickle/Q$PHRED/*_R1_*cutsick.fastq >> Stats/total_reads_R1_trimmed.fastq;
 						cat $i/Cutadapt_Sickle/Q$PHRED/*_R2_*cutsick.fastq >> Stats/total_reads_R2_trimmed.fastq;
