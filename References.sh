@@ -85,10 +85,12 @@ else
 
 	wget ftp://www.homd.org/16S_rRNA_refseq/HOMD_16S_rRNA_RefSeq/HOMD_16S_rRNA_RefSeq_V15.1.qiime.taxonomy
 	wget ftp://www.homd.org/16S_rRNA_refseq/HOMD_16S_rRNA_RefSeq/HOMD_16S_rRNA_RefSeq_V15.1.aligned.fasta
+	
 	#HOMD_16S_rRNA_RefSeq_V15.1.fasta header needs to be modified to use with RDP classifier
 	wget ftp://www.homd.org/16S_rRNA_refseq/HOMD_16S_rRNA_RefSeq/HOMD_16S_rRNA_RefSeq_V15.1.fasta
 	cat HOMD_16S_rRNA_RefSeq_V15.1.fasta|awk -F " " '{print $1}' > HOMD_16S_rRNA_RefSeq_V15.1_ModHeader.fasta
 	
+	wget ftp://www.homd.org/16S_rRNA_refseq/HOMD_16S_rRNA_RefSeq/HOMD_16S_rRNA_RefSeq_V15.1.tre
 
 	cd ..
 fi
