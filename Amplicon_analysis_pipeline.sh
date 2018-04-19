@@ -475,8 +475,8 @@ set -e
 				#HOMD
 				export REF="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1_ModHeader.fasta";
 				export TAX="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.qiime.taxonomy";
-				#export TREE="$REF_DATA_PATH/";
-				#export ALIGNED="$REF_DATA_PATH/";
+				export TREE="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.tre";
+				export ALIGNED="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.aligned.fasta";
 				export CORE="$REF_DATA_PATH/HOMD/HOMD_16S_rRNA_RefSeq_V15.1.aligned.fasta";
 				#export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
 				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
