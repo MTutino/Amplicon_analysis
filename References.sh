@@ -28,14 +28,14 @@ fi
 
 #Silva 
 #Create the directory for Silva if not present
-mkdir -p $DIR/Silva;
+mkdir -p $DIR/SILVA;
 
 #Check if directory is empty. if empty, download the reference
-if [[  "$(ls -A $DIR/Silva)" ]];
+if [[  "$(ls -A $DIR/SILVA)" ]];
 then
-	echo "Silva folder not empty"
+	echo "SILVA folder not empty"
 else
-	cd $DIR/Silva
+	cd $DIR/SILVA
 	
 	wget https://www.arb-silva.de/fileadmin/silva_databases/qiime/Silva_123_release.zip
 	unzip Silva_123_release.zip
