@@ -36,15 +36,12 @@ then
 	echo "Silva folder not empty"
 else
 	cd $DIR/Silva
-
-	wget https://www.arb-silva.de/fileadmin/silva_databases/qiime/Silva_119_release.zip
-	unzip Silva_119_release.zip
-	rm Silva_119_release.zip
+	
+	wget https://www.arb-silva.de/fileadmin/silva_databases/qiime/Silva_123_release.zip
+	unzip Silva_123_release.zip
+	rm -r Silva_123_release.zip
 	rm -r __MACOSX
-
-	wget https://www.arb-silva.de/fileadmin/silva_databases/qiime/Silva_119_release_aligned_rep_files.tar.gz
-	tar -zxvf Silva_119_release_aligned_rep_files.tar.gz
-	rm Silva_119_release_aligned_rep_files.tar.gz
+	
 	cd ..
 fi
 
