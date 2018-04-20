@@ -460,14 +460,14 @@ set -e
 	
 		if [[ -n $SILVA ]]; then 
 
-				echo "Reference database: Silva_119" >> $LOG;
+				echo "Reference database: Silva_123" >> $LOG;
 				#Silva
-				export REF="$REF_DATA_PATH/Silva/Silva119_release/rep_set/97/Silva_119_rep_set97.fna";
-				export TAX="$REF_DATA_PATH/Silva/Silva119_release/taxonomy/97/taxonomy_97_7_levels.txt";
-				export TREE="$REF_DATA_PATH/Silva/Silva119_release/97_FastTree_trees/Silva_119_rep_set97_aligned_16S_only_pfiltered.tre";
-				export ALIGNED="$REF_DATA_PATH/Silva/Silva119_release_aligned_rep_files/97_16S_only/Silva_119_rep_set97_aligned_16S_only.fna";
-				export CORE="$REF_DATA_PATH/Silva/Silva119_release/core_alignment/core_Silva119_alignment.fna";
 				export CHIM="$REF_DATA_PATH/RDPClassifier_16S_trainsetNo14_rawtrainingdata/trainset14_032015.fasta";
+				export TAX="$REF_DATA_PATH/SILVA/SILVA123_QIIME_release/taxonomy/16S_only/97/taxonomy_7_levels.txt"
+				export REF="$REF_DATA_PATH/SILVA/SILVA123_QIIME_release/rep_set/rep_set_16S_only/97/97_otus_16S.fasta"
+				export CORE="$REF_DATA_PATH/SILVA/SILVA123_QIIME_release/core_alignment/core_alignment_SILVA123.fasta"
+				export TREE="$REF_DATA_PATH/SILVA/SILVA123_QIIME_release/trees/97/97_otus.tre"
+				export ALIGNED="$REF_DATA_PATH/SILVA/SILVA123_QIIME_release/core_alignment/core_alignment_SILVA123.fasta"
 
 		elif [[ -n $HOMD ]];then
 
