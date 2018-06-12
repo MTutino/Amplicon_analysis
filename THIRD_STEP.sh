@@ -93,15 +93,15 @@ summarize_taxa.py -i $BIOM -o $RESULTS_PATH/taxa -L 2,3,4,5,6,7 -a;
 plot_taxa_summary.py -i $RESULTS_PATH/taxa/*L2.txt,$RESULTS_PATH/taxa/*L6.txt,$RESULTS_PATH/taxa/*L7.txt -l Phylum,Genus,Species -c pie,bar -o $RESULTS_PATH/phylum_genus_charts/ ;
 		
 #Get the 75% of the min depth for the jackknife analysis
-PER=$(echo "($MINDEPTH/100)*75"|bc -l| awk -F "." '{print $1}') ;
-echo "jackknifed_beta_diversity.py $(date|awk '{print $4}')" >> $LOG;
-rm -rf $RESULTS_PATH/Jackknifed_betadiversity;
-jackknifed_beta_diversity.py -i $BIOM -t $TREE -m $METATABLE -o $RESULTS_PATH/Jackknifed_betadiversity -e $PER -f;
+#PER=$(echo "($MINDEPTH/100)*75"|bc -l| awk -F "." '{print $1}') ;
+#echo "jackknifed_beta_diversity.py $(date|awk '{print $4}')" >> $LOG;
+#rm -rf $RESULTS_PATH/Jackknifed_betadiversity;
+#jackknifed_beta_diversity.py -i $BIOM -t $TREE -m $METATABLE -o $RESULTS_PATH/Jackknifed_betadiversity -e $PER -f;
 	
 #After the above command you can generate a pdf of the bootstrap tree.  It shows the tree with #internal nodes colored, red for 75-100% support, yellow for 50-75%, green for 25-50%, and blue for #< 25% support.
-echo "make_bootstrapped_tree.py $(date|awk '{print $4}')" >> $LOG;
-make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/jackknife_unweighted_unifrac.pdf ;
-make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/jackknife_weighted_unifrac.pdf ;
+#echo "make_bootstrapped_tree.py $(date|awk '{print $4}')" >> $LOG;
+#make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/jackknife_unweighted_unifrac.pdf ;
+#make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/jackknife_weighted_unifrac.pdf ;
 
 #Create the heatmap in html format		
 make_otu_heatmap_html.py -i $BIOM -o $RESULTS_PATH/Heatmap -t $TREE  -m $METATABLE;	
