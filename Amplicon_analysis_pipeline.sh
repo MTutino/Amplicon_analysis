@@ -254,7 +254,6 @@ vsearch113
 ChimeraSlayer.pl
 print_qiime_config.py
 fasta-splitter.pl
-fasta_number.py
 blastall
 R"
 # Require usearch executables for specific pipelines
