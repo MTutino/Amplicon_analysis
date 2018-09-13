@@ -124,7 +124,6 @@ If you are using the programme on CSF load the following modules (you can copy a
 	module load apps/binapps/microbiomeutil/r20110519
 	module load apps/binapps/blast/legacy/2.2.26
 	module load apps/binapps/usearch/8.0.1623
-	module load apps/binapps/fasta_number/02jun2015
 	module load apps/binapps/fasta-splitter/0.2.4
 	module load apps/binapps/rdp_classifier/2.2
 	module load apps/gcc/R/3.2.0

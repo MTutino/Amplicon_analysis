@@ -50,7 +50,7 @@ CHIM_REF=$(grep -E chimeras\|found $UPARSE_STDERR);
 echo "{$CHIM_REF}"|grep -v +|head -2|tail -1|awk 'END {print "Reference based chimera removal found : "$NF" Chimeras ("$(NF-3)" OTUs)"}'| sed 's/(//1;s/)//1'|sed 's/\r//g' >> $LOG;
 		
 # Label OTUs using UPARSE python script
-python $( which fasta_number.py) Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta OTU_> Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTUs.fasta;
+python $DIR/relabel_fasta/relabel_fasta.py Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta OTU_> Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTUs.fasta;
 
 # Map reads (including singletons) back to OTUs directly when possible. If the file is too big the script will use an alternative strategy from Dr Ijaz tutorial
 mkdir -p Uparse_OTU_tables;		
