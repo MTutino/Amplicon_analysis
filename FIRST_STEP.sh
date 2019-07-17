@@ -82,6 +82,8 @@
 				fi;
 		done;
 
+	# Only run the following steps if using vsearch of UPARSE. Not needed if using DADA2
+	if [ $PIPELINE_NAME != "DADA2" ]; then
 
 		#SPAdes for error correction of illumina MiSeq reads
 		echo "SPADes version 3.5.0. Started at $(date|awk '{print $4}')" >> $LOG;
@@ -96,7 +98,6 @@
 						cd ../../../; 
 				fi;
 		done;
-	
 	
 		# Pandaseq
 		echo "Pandaseq version 2.8. Started at $(date|awk '{print $4}')" >> $LOG;
@@ -211,5 +212,5 @@ for i in $(ls -d */ 2> /dev/null); do
 		rsync -a Stats/ QUALITY_CONTROL ;
 		rm -r Stats/ ;
 		
-				
+fi				
 		echo "Quality control step finished at $(date|awk '{print $4}')" >> $LOG;

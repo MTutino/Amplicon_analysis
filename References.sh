@@ -92,3 +92,23 @@ else
 	cd ..
 fi
 
+
+# DADA2 SILVA 123
+#Create the directory for RDPClassifier if not present
+mkdir -p $DIR/SILVA/ ;
+mkdir -p $DIR/SILVA/DADA2_SILVA123/ ;
+
+#Check if directory is empty. if empty, download the reference
+if [[  "$(ls -A $DIR/SILVA/DADA2_SILVA123)" ]];
+then
+	echo "DADA2_SILVA123 folder not empty"
+
+else
+	cd $DIR/SILVA/DADA2_SILVA123/
+
+	wget https://zenodo.org/record/158958/files/silva_nr_v123_train_set.fa.gz
+	wget https://zenodo.org/record/158958/files/silva_species_assignment_v123.fa.gz
+	
+
+	cd ../../
+fi

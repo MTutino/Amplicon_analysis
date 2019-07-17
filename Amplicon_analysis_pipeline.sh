@@ -8,6 +8,33 @@
 #
 #*****************************************************************************************************
 
+####################################################
+#####	MODULES RECUIRED	########################
+
+## THESE WORK IN CSF2
+##(Cutadapt is included in anaconda)
+#module load apps/binapps/anaconda/2.2.0
+#module load apps/gcc/sickle/1.33
+#module load apps/gcc/bioawk/27-08-2013
+#module load apps/gcc/pandaseq/2.8
+#module load apps/binapps/spades/3.5.0
+#module load apps/binapps/fastqc/0.11.3
+
+
+#module load apps/binapps/usearch/6.1.544
+#module load apps/gcc/qiime/1.8.0
+#module load apps/binapps/vsearch/1.1.3
+##(ChimeraSlayer is included in mnicrobiomeutil)
+#module load apps/binapps/microbiomeutil/r20110519
+#module load apps/binapps/blast/legacy/2.2.26
+#module load apps/binapps/usearch/8.0.1623
+#module load apps/binapps/fasta-splitter/0.2.4
+#module load apps/binapps/rdp_classifier/2.2
+#module load compilers/gcc/6.3.0
+#module load apps/gcc/R/3.4.3
+
+
+
 # Best options for amplicon sequencing illumina miseq analysis V3-V4: -q 20 -l 10 -o 10 -L 380
 
 set -o errexit
@@ -17,7 +44,6 @@ usage()
 {
 cat << EOF
 usage: $0 options
-
 ######################################################################################################################################################################################
 #
 #   This script is for the analysis of 16S rRNA data from Illumina Miseq (Casava >= 1.8) paired-end reads. 
@@ -37,12 +63,9 @@ usage: $0 options
 #
 #
 ######################################################################################################################################################################################
-
 The script requires the files "Final_name.txt" and "Metatable.txt".
 "Categories.txt" is optional.
-
 For an example of these files look at the README.txt.
-
 Best options for the analysis of V3-V4 hypervariable regions: -q 20 -l 10 -o 10 -L 380
 OPTIONS:
    -h      Show this message
@@ -57,7 +80,6 @@ OPTIONS:
    -S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
    -H	   Human Oral Microbiome Database
    -r      Path to the directory with the reference databases, if not same as the script directory ***OPTIONAL***
-
  *** To run only the third step ***
    -3	   Pass this flag without any argument to run only the third step
    -i	   BIOM file
@@ -69,27 +91,20 @@ OPTIONS:
   *** If you want to modify the matatable file use Metatable_log/Metatable_mod.txt because sample names could be different, e.g. "-" instead of "_" ***
    
 EXAMPLE USAGE:
-
 ## The following command will use default options for QC,vsearch pipeline and greengenes database
 qsub Amplicon_analysis_pipeline.sh -g CCTACGGGNGGCWGCAG -G GACTACHVGGGTATCTAATCC -P vsearch 
-
 ## The following command will NOT use cutadapt (for example to analyse samples amplified with different primers together) and it will use the uparse pipeline and silva database
 qsub Amplicon_analysis_pipeline.sh -P uparse -S
-
 ## The following command will suppress the first step and the analysis will start directly from the second step.
 ## Useful if you have already analysed this data, for example with Vsearch, and you want to try a different one or if you used GreenGenes and you want to try Silva
 qsub Amplicon_analysis_pipeline.sh -1 suppress -P uparse
-
 ## The following command will run only the third step
 ## Useful if you want to produce new plots after filtering out some samples from the OTU table.
 qsub Amplicon_analysis_pipeline.sh -3 -i Path/Vsearch_OTU_tables/otu_table_without_mocks.biom -o Path/RESULTS_2/ -m Path/Metatable_log/Metatable_mod.txt -t Path/Vsearch_OTU_tables/otus.tre
-
 ################################################################################################################################################################################
 #	IF YOU DID ANY MISTAKE OR SOMETHING WENT WRONG DURING THE FIRST STEP AND WANT TO START THE ANALYSIS FROM THE BEGINNING I ADVICE YOU TO DELETE EVERYTHING BEFORE TO START.
 #	OTHERWISE SOME PROGRAMMES IN THE FIRST STEP COULD GET STUCK INSTEAD OF OVERWRITE THE FILES.
 #################################################################################################################################################################################
-
-
 EOF
 };
 
@@ -240,7 +255,8 @@ fi;
 export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd );
 
 # Get pipeline name in uppercase
-PIPELINE_NAME=$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')
+export PIPELINE_NAME=$(echo $PIPELINE | tr '[:lower:]' '[:upper:]')
+ 
 
 #Check for required programs in current environment
 #Report missing programs and exit if any are not installed/loaded
@@ -250,12 +266,13 @@ fastqc
 spades
 bioawk
 pandaseq
-vsearch113
-ChimeraSlayer.pl
+vsearch
 print_qiime_config.py
 fasta-splitter.pl
 blastall
 R"
+#vsearch113
+#ChimeraSlayer.pl
 # Require usearch executables for specific pipelines
 case "$PIPELINE_NAME" in
     "UPARSE")
@@ -264,7 +281,7 @@ case "$PIPELINE_NAME" in
 usearch8.0.1623_i86linux32"
 	;;
     "QIIME")
-	# UPARSE pipeline needs usearch 6.1.544
+	# QIIME pipeline needs usearch 6.1.544
 	REQUIRED_PROGRAMS="$REQUIRED_PROGRAMS
 usearch6.1.544_i86linux32"
 	;;
@@ -346,6 +363,14 @@ if [[ -z $STEP3 ]]; then
 				exit 1 ;
 		fi;
 
+	# Get number of columns in the Final_name.txt
+	#col_count=$(awk '{print NF}' $NAMES | sort -nu|tail -n1)
+	# Check that the file has the required 3 fields
+	#if [ $col_count -lt 3 ];then
+	#	echo -e "The file \"$NAMES\" does not have the right number of columns" >> $LOG;
+	#	exit 1;
+	#fi
+
 		#Check that there is a unique name per sample and that the samples are spelt right
 		#Get the number of unique final names
 		FIN_NAME=$(awk '{print $2}' $NAMES|awk NF|sort|uniq|wc -l);
@@ -403,7 +428,7 @@ if [[ -z $STEP3 ]]; then
 		set +e;	
 		for i in $(ls); do 
 				set -e;
-				while read -r file_name final_name; do 
+				while read -r file_name final_name run; do 
 						if [[ "$i" == "$file_name" ]]; then 
 								mkdir -p $final_name; 
 								mv $i $final_name;
@@ -422,6 +447,7 @@ if [[ -z $STEP3 ]]; then
 		fi;
 
 ####################################################### JUNCTION BETWEEN FIRST AND SECOND STEP #################################################
+if [[ $PIPELINE != "DADA2"  ]]; then
 		# Check if multiplexed and multiplexed_linearized.fasta already exist and if their size is not zero
 		FILENAME1="Multiplexed_files/multiplexed.fasta";
 		FILENAME2="Multiplexed_files/multiplexed_linearized.fasta";
@@ -452,7 +478,7 @@ set -e
 				awk 'NR==1 {print ; next} {printf /^>/ ? "\n"$0"\n" : $1} END {print}' Multiplexed_files/multiplexed.fasta > Multiplexed_files/multiplexed_linearized.fasta;
 
 		fi;
-
+fi
 		# Reference databases directory
 		export REF_DATA_PATH="${REF_DATA_PATH:-$DIR}"
 		echo "Expecting reference databases under $REF_DATA_PATH"
@@ -525,6 +551,10 @@ set -e
 		    "VSEARCH")
 			source $DIR/VSEARCH.sh
 			;;
+			"DADA2")
+			export CORE="$REF_DATA_PATH/SILVA/SILVA123_QIIME_release/core_alignment/core_alignment_SILVA123.fasta"
+			source $DIR/DADA2.sh
+			;;
 		    *)
 			# Unrecognised pipeline
 			if [ -z $PIPELINE ]; then
@@ -548,4 +578,3 @@ else
 		source $DIR/STAT_ANALYSIS.sh STAT_ANALYSIS.sh
 				
 fi;
-	

@@ -10,23 +10,18 @@ check_dimension
 
 # Set a variable to give a short name for the USEARCH binary
 UPARSE=$(which usearch8.0.1623_i86linux32);
-
-# Set up a temporary file to capture the stderr output from the
-# Vsearch steps of interest, using the idiom 'CMD 2> >(tee -a FILE >&2)'
-# (see e.g. http://stackoverflow.com/a/692407/579925)
-UPARSE_STDERR=$(mktemp --tmpdir=$(pwd) --suffix=".uparse")
-
+	
 mkdir -p Multiplexed_files/Uparse_pipeline
 # If the dimension is in megabyte or is smaller then 3 gigabyte we can use usearch for dereplication
 if [[ -n "$megabyte" ]] || [[ -n "$gigabyte" ]] && [[ "$gigabyte" -le "3" ]]; then
 		echo "-derep_fulllength $(date|awk '{print $4}')" >> $LOG;
-		$UPARSE -derep_fulllength Multiplexed_files/multiplexed_linearized.fasta -fastaout Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta -sizeout -threads $NSLOTS 2> >(tee $UPARSE_STDERR >&2);
-		SING=$(grep singletons $UPARSE_STDERR);
+		$UPARSE -derep_fulllength Multiplexed_files/multiplexed_linearized.fasta -fastaout Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta -sizeout -threads $NSLOTS;
+		SING=$(grep singletons *.e$JOB_ID);
 		echo $SING| awk '{print "singletons discarded "$9" ("$7" reads)"}'|sed 's/(//;s/)//' >> $LOG ;
 else
-		# I will use a piece of Vsearch just for demultiplexing.This is extremely faster than the following workaround
-		# Woraround: "grep -v "^>" Multiplexed_files/multiplexed_linearized.fasta | grep -v [^ACGTacgt] | sort -d | uniq -c | while read abundance sequence ; do hash=$(printf "${sequence}" | sha1sum); hash=${hash:0:40};printf ">%s;size=%d;\n%s\n" "${hash}" "${abundance}" "${sequence}"; done >> Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta"
-		echo "Uparse -derep_fulllength cannot handle files bigger than 3GB. I had to use a piece of Vsearch just for this task."
+		# I will use a piece of Vsearch just for demultiplexing.
+		#grep -v "^>" Multiplexed_files/multiplexed_linearized.fasta | grep -v [^ACGTacgt] | sort -d | uniq -c | while read abundance sequence ; do hash=$(printf "${sequence}" | sha1sum); hash=${hash:0:40};printf ">%s;size=%d;\n%s\n" "${hash}" "${abundance}" "${sequence}"; done >> Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta
+		echo "Uparse -derep_fulllength cannot handle files bigger than 3GB. I have to use a piece of Vsearch just for this task."
 		echo "--derep_fulllength $(date|awk '{print $4}')" >> $LOG;
 		VSEARCH=$(which vsearch113);
 		$VSEARCH --derep_fulllength Multiplexed_files/multiplexed_linearized.fasta --output Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated.fasta --sizeout;				
@@ -37,19 +32,22 @@ $UPARSE -sortbysize Multiplexed_files/Uparse_pipeline/multiplexed_linearized_der
 
 # cluster OTUs and de novo chimera removal
 echo "cluster_otus (de novo chimera removal) $(date|awk '{print $4}')" >> $LOG;
-$UPARSE -cluster_otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2.fasta -otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta 2> >(tee $UPARSE_STDERR >&2);
-CHIM_DE=$(awk '/chimeras/' $UPARSE_STDERR);
+$UPARSE -cluster_otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2.fasta -otus Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta;
+CHIM_DE=$(awk '/chimeras/' *.e$JOB_ID);
 echo "{$CHIM_DE}"|head -1|awk 'END {print "De novo chimera removal found : "$NF" Chimeras ("$(NF-2)" OTUs). "$(NF-4)" OTUs left."}'| sed 's/(//1;s/)//1'|sed 's/\r//g' >> $LOG;
 		
 # Reference chimera removal
 echo "-uchime_ref (reference chimera removal) $(date|awk '{print $4}')" >> $LOG;
-$UPARSE -uchime_ref Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta -db $CHIM -strand plus -nonchimeras Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta -threads $NSLOTS 2> >(tee $UPARSE_STDERR >&2);
-
-CHIM_REF=$(grep -E chimeras\|found $UPARSE_STDERR);
+$UPARSE -uchime_ref Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset.fasta -db $CHIM -strand plus -nonchimeras Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta -threads $NSLOTS;
+#CHIM_REF=$(awk '/chimeras/' *.e$JOB_ID);
+#echo "Ref. based chimera check found :" >> $LOG;
+CHIM_REF=$(grep -E chimeras\|found *.e$JOB_ID);
 #I am not sure this will work any time
 echo "{$CHIM_REF}"|grep -v +|head -2|tail -1|awk 'END {print "Reference based chimera removal found : "$NF" Chimeras ("$(NF-3)" OTUs)"}'| sed 's/(//1;s/)//1'|sed 's/\r//g' >> $LOG;
 		
 # Label OTUs using UPARSE python script
+#python $( which fasta_number.py) Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta OTU_> Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTUs.fasta;
+
 python $DIR/relabel_fasta/relabel_fasta.py Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta OTU_> Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTUs.fasta;
 
 # Map reads (including singletons) back to OTUs directly when possible. If the file is too big the script will use an alternative strategy from Dr Ijaz tutorial
@@ -81,7 +79,16 @@ echo "Create otu table $(date|awk '{print $4}')" >> $LOG;
 if [ -f Uparse_OTU_tables/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTU_table.biom ]; then
 		rm Uparse_OTU_tables/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTU_table.biom;
 fi;
-biom convert --table-type="otu table" -i Uparse_OTU_tables/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTU_table.txt -o Uparse_OTU_tables/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTU_table.biom;
+biom convert --table-type="OTU table" -i Uparse_OTU_tables/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTU_table.txt -o Uparse_OTU_tables/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTU_table.biom --to-json;
+
+# Assign taxonomy
+#if [[ -z $SILVA ]]; then
+#	echo "parallel_assign_taxonomy_rdp.py $(date|awk '{print $4}')" >> $LOG;
+#	parallel_assign_taxonomy_rdp.py --rdp_max_memory 12000 -t $TAX -r $REF -i Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTUs.fasta -o Vsearch_OTU_tables/assigned_taxonomy -O $NSLOTS;
+#else		
+#	echo "parallel_assign_taxonomy_uclust.py $(date|awk '{print $4}')" >> $LOG;
+#	parallel_assign_taxonomy_uclust.py -t $TAX -r $REF -i Multiplexed_files/Uparse_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras_OTUs.fasta -o Uparse_OTU_tables/assigned_taxonomy -O $NSLOTS;
+#fi;
 		
 # Assign taxonomy
 echo -e "assign_taxonomy_rdp.py $(date|awk '{print $4}')\nRDP_Classifier version 2.2" >> $LOG;
@@ -118,15 +125,11 @@ echo "UPARSE pipeline finished at $(date|awk '{print $4}')" >> $LOG;
 		
 #Lets create the directory for the outputs in the third step
 mkdir -p RESULTS/ ;
-
-if [[ -n $SILVA ]]; then
-		mkdir -p RESULTS/Uparse_silva ;
-		export RESULTS_PATH="RESULTS/Uparse_silva" ;
-elif [[ -n $HOMD ]]; then
-		mkdir -p RESULTS/Uparse_homd ;
-		export RESULTS_PATH="RESULTS/Uparse_homd" ;		
-else			
+				
+if [[ -z $SILVA ]]; then			
 		mkdir -p RESULTS/Uparse_gg ;
-		export RESULTS_PATH="RESULTS/Uparse_gg" ;				
+		export RESULTS_PATH=RESULTS/Uparse_gg ;			
+else			
+		mkdir -p RESULTS/Uparse_silva ;
+		export RESULTS_PATH=RESULTS/Uparse_silva ;			
 fi;
-

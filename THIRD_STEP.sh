@@ -15,13 +15,13 @@ fi;
 biom summarize-table --qualitative -i $BIOM -o $RESULTS_PATH/OTUs_count.txt;
 biom summarize-table -i $BIOM -o $RESULTS_PATH/table_summary.txt; 
 
-#Check if there are samples with less than 5000 sequences. These will be excluded because it would be a problem for subsequent analyses
+#Check if there are samples with less than 5000 sequences. These will be excluded since it would be a problem for subsequent analyses
 #In case samples with <5K seqs are found a new OTU table will be made
 #Get a list of samples with more and less than 5000 sequences
 LESSFIVEK=$(tail -n+17 $RESULTS_PATH/table_summary.txt |awk -F ":" '{if ( $2 <= 5000) print $1"\t"$2 }'|sed 's/ //g');
 MOREFIVEK=$(tail -n+17 $RESULTS_PATH/table_summary.txt |awk -F ":" '{if ( $2 >= 5000) print $1 }'|sed 's/ //g');
 
-#If there are samples with less than 5000 sequences, filter them out from the OTU table for subsequent analyses
+#If there are samples with less than 5000 sequences filter them out from the OTU table for subsequent analyses
 if [[ -n $LESSFIVEK ]];then 
 		
 		echo -e "The following samples have less than 5000 sequences and have being excluded from the analysis:\nSample_Name\tNumber_of_Sequences\n$LESSFIVEK" >> $LOG; 
@@ -46,7 +46,7 @@ if [[ -n $LESSFIVEK ]];then
 		biom summarize-table -i $BIOM -o $RESULTS_PATH/table_summary.txt; 
 fi;
 	
-#Extract the minimum depth to use in beta-diversity
+#Extract the min. depth to use in beta-diversity
 MINDEPTH=$(grep Min $RESULTS_PATH/table_summary.txt |awk -F " " '{print $2}'|awk -F "." '{print $1}');
 	
 #Beta-diversity analysis
@@ -61,8 +61,9 @@ make_2d_plots.py -i $RESULTS_PATH/beta_div_even/unweighted_unifrac_pc.txt -m $ME
 #Calculate alpha diversity
 echo "Calculate alpha diversity $(date|awk '{print $4}')" >> $LOG
 mkdir -p $RESULTS_PATH/Alpha_diversity/ ;
-
-#CHAO1 and ACE are metrics based on singletons counts. They cannot be used because singletons are already filtered out from the analysis and the result would not be correct
+#MINDEPTH_2=$(echo $(($MINDEPTH-2000)));
+#CHAO1 and ACE are metrics based on singletons counts. They have to be deleted because singletons are already filtered out from the analysis.
+#ALPHA_METRICS="observed_species,chao1,ACE,shannon,simpson,fisher_alpha";
 ALPHA_METRICS="observed_species,shannon,simpson,fisher_alpha";
 rm -rf $RESULTS_PATH/Rarefied_otu_tables/;
 multiple_rarefactions.py -i $BIOM -m 200 -x $MINDEPTH -s 2000 -n 10 -o $RESULTS_PATH/Rarefied_otu_tables/ ;
@@ -70,6 +71,7 @@ rm -rf $RESULTS_PATH/Alpha_diversity/Alpha_rarefactions/;
 mkdir -p $RESULTS_PATH/Alpha_diversity/Alpha_rarefactions/ ;
 alpha_diversity.py -i $RESULTS_PATH/Rarefied_otu_tables/ -m $ALPHA_METRICS -o $RESULTS_PATH/Alpha_diversity/Alpha_rarefactions/ -t $TREE ;
 collate_alpha.py -i $RESULTS_PATH/Alpha_diversity/Alpha_rarefactions/ -o $RESULTS_PATH/Alpha_diversity/collated_alpha/ ;
+#export MPLBACKEND="agg"
 make_rarefaction_plots.py -i $RESULTS_PATH/Alpha_diversity/collated_alpha/ -m $METATABLE -o $RESULTS_PATH/Alpha_diversity/rarefaction_curves/;
 
 #Compare Alpha diversity
@@ -91,10 +93,21 @@ fi;
 echo "summarize_taxa_through_plots.py $(date|awk '{print $4}')" >> $LOG;
 summarize_taxa.py -i $BIOM -o $RESULTS_PATH/taxa -L 2,3,4,5,6,7 -a;
 plot_taxa_summary.py -i $RESULTS_PATH/taxa/*L2.txt,$RESULTS_PATH/taxa/*L6.txt,$RESULTS_PATH/taxa/*L7.txt -l Phylum,Genus,Species -c pie,bar -o $RESULTS_PATH/phylum_genus_charts/ ;
+#summarize_taxa_through_plots.py -o $ANALYSIS_PATH/taxa_summary/ -i $BIOM -m Metatable.txt -f ;
 		
+#Lets get the 75% of the min depth for the jackknife analysis
+PER=$(echo "($MINDEPTH/100)*75"|bc -l| awk -F "." '{print $1}') ;
+echo "jackknifed_beta_diversity.py $(date|awk '{print $4}')" >> $LOG;
+rm -rf $RESULTS_PATH/Jackknifed_betadiversity;
+jackknifed_beta_diversity.py -i $BIOM -t $TREE -m $METATABLE -o $RESULTS_PATH/Jackknifed_betadiversity -e $PER -f;
+	
+#After the above command you can generate a pdf of the bootstrap tree.  It shows the tree with #internal nodes colored, red for 75-100% support, yellow for 50-75%, green for 25-50%, and blue for #< 25% support.
+echo "make_bootstrapped_tree.py $(date|awk '{print $4}')" >> $LOG;
+make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/unweighted_unifrac/jackknife_unweighted_unifrac.pdf ;
+make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/jackknife_weighted_unifrac.pdf ;
 
 #Create the heatmap in html format		
-make_otu_heatmap_html.py -i $BIOM -o $RESULTS_PATH/Heatmap -t $TREE  -m $METATABLE;	
+make_otu_heatmap.py -i $BIOM -o $RESULTS_PATH/Heatmap -t $TREE  -m $METATABLE;	
 	
 echo "Third step finished at $(date|awk '{print $4}')" >> $LOG;
 	
