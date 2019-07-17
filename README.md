@@ -7,11 +7,13 @@ It is divided in 3 steps:
 	    (Schirmer and Ijaz et al.,"Insight into biases and sequencing errors for amplicon sequencing with the Illumina MiSeq platform." ,Nucleic Acids Res., 2015)
 	    
 	2) Remove singletons and chimeras, and build an OTU table
-		QIIME pipeline: to remove singletons and chimeras and build otu table and phylogenetic tree (open-reference method with usearch61 if possible (it depends on the files' size), otherwise closed-reference method with #		uclust)
+		REMOVED: QIIME pipeline: to remove singletons and chimeras and build otu table and phylogenetic tree (open-reference method with usearch61 if possible (it depends on the files' size), otherwise closed-reference method with #		uclust)
 	
 		UPARSE pipeline: free version limited to 4Gb RAM
 	
 		Vsearch pipeline: A freely available programme almost identical to Uparse but not limited to 4Gb RAM
+		
+		DADA2
 	
 	3)  QIIME to perform beta and alpha diversity analysis
 
@@ -57,6 +59,7 @@ For the final name the only accepted special characters are underscore "_", dot 
 
 This file is important for the third step. You have to use a specific format. 
 You can find a description of it on QIIME website for more information (http://qiime.org/documentation/file_formats.html).
+The column Run, defining the sequencing run, must be included when using DADA2
 
 **EXAMPLE:**
 
@@ -66,7 +69,7 @@ You can find a description of it on QIIME website for more information (http://q
 	Mock-RUN3	AGGCAGAAGCGTAAGA		3	Control
 
 The column "LinkerPrimerSequence" is empty but it cannot be deleted.
-The header is very important. "#SampleID", "Barcode", "LinkerPrimerSequence" and "Description" are mandatory. 
+The header is very important. "#SampleID", "Barcode", "LinkerPrimerSequence", "Run" and "Description" are mandatory. 
 Between "LinkerPrimerSequence" and "Description" you can add as many columns as you want.
 For every column a PCoA plot will be created during the third step.
 
@@ -105,24 +108,25 @@ If you are using the programme on CSF load the following modules (you can copy a
 **Step1:**
 
 	#(Cutadapt is included in anaconda)
-	module load apps/binapps/anaconda/2.2.0
+	module load apps/anaconda/2.5.0/bin
 	module load apps/gcc/sickle/1.33
 	module load apps/gcc/bioawk/27-08-2013
-	module load apps/gcc/pandaseq/2.8
-	module load apps/binapps/spades/3.5.0
-	module load apps/binapps/fastqc/0.11.3
+	module load apps/pandaseq/2.8.1/gcc-4.8.5
+	module load apps/binapps/spades/3.10.1
+	module load apps/fastqc/0.11.3/noarch
+
 **Step2/3:**
 
-	module load apps/binapps/usearch/6.1.544
-	module load apps/gcc/qiime/1.8.0
-	module load apps/binapps/vsearch/1.1.3
-	#(ChimeraSlayer is included in mnicrobiomeutil)
-	module load apps/binapps/microbiomeutil/r20110519
+	module load apps/bioinf
+	module load apps/qiime/1.9.1/python-2.7.8+numpy-1.9.2+scipy-0.17.0+pycogent-1.5.3+pandas-0.17.0+biomformat-2.1.4+matplotlib-1.4.3+ghc-7.8.2+pynast-1.2.2
+	module load apps/binapps/vsearch/2.10.4
+	module load apps/binapps/fasta-splitter/0.2.6
+	module load apps/rdpclassifier/2.2/noarch
+	module load compilers/gcc/8.2.0
 	module load apps/binapps/blast/legacy/2.2.26
 	module load apps/binapps/usearch/8.0.1623
-	module load apps/binapps/fasta-splitter/0.2.4
-	module load apps/binapps/rdp_classifier/2.2
-	module load apps/gcc/R/3.2.0
+	module load apps/R/3.5.2/gcc-4.8.5+lapack-3.5.0+blas-3.6.0
+
 
 On the other hand, if you are using the programme in interactive mode be sure you have installed all the required programmes and that they are installed in your bin folder. 
 
@@ -138,7 +142,7 @@ Best options for the analysis of V3-V4 hypervariable regions [Default options]: 
    	-O (Uppercase "O")     Minimum overlap in bp between forward and reverse reads [default 10] (Pandaseq) ***OPTIONAL***
    	-L      Minimum length in bp for a sequence to be kept after overlapping [default 380] (Pandaseq) ***OPTIONAL***
    	-1 (One)     Use this option "-1 suppress" to skip the Quality Control step
-   	-P	   Use this option to decide which pipeline you want to use, UPARSE, Vsearch or QIIME. UPARSE="-P uparse". Vsearch="-P vsearch". QIIME="-P QIIME"  ***REQUIRED***
+   	-P	   Use this option to decide which pipeline you want to use, UPARSE, Vsearch or DADA2. UPARSE="-P uparse". Vsearch="-P vsearch". DADA2="-P DADA2"  ***REQUIRED***
    	-S	   The default reference database is GreenGenes. Use this option without any argument if you want to use Silva. To use Silva you need at least 22 Gb of RAM.
 
  ***_To run only the third step_***
@@ -206,28 +210,11 @@ If the programme ran successfully you will get the following output
 **"QUALITY_CONTROL"**: It contains information about length distribution for raw and trimmed data plus the number of reads for every piece of the quality control step.
 
 
-**"QIIME_OTU_tables"**: The free version of Usearch V.6.1 cannot handle files bigger than 3 Gb (multiplexed_files/multiplexed_linearized.fasta, not the single raw files).
-
-If multiplexed_files/multiplexed_linearized.fasta is:
-
-	-smaller than 3GB, an open reference OTU picking and chimera removal will be performed. Here is the output you are interested in:
-	 
-		1) otu_table_mc2_w_tax_no_pynast_failures.biom. #This is the final output of "pick_open_reference_otus.py". Read the manual for more explanation.
-		2) otu_table.biom. #This is an otu table filtered for low abundance OTUs. filter_otus_from_otu_table.py -i INPUT -o OUTPUT --min_count_fraction 0.00005
-		   This is the file that will be used to create the plots in the third step.
-		3) rep_set_tre #It is tree you need for further analyses
-	 You will need these files for other analysis in QIIME or in R (Phyloseq package)
-
-	-bigger than 3GB, a closed reference OTU picking and chimera removal (ChimeraSlayer) will be performed. Here is the output you are interested in:
-
-		1) otu_table_no_chimeras_no_singletons.biom. 
-		2) otu_table.biom. #This is an otu table filtered for low abundance OTUs. filter_otus_from_otu_table.py -i INPUT -o OUTPUT --min_count_fraction 0.00005
-
-	 *** This is a closed reference analysis and the tree file will be the GreenGenes/Silva one! ****
-
-
-
-
+**"DADA2_OTU_tables"** : 
+		1) Error_rate_plots # Folder containing the plots of learned error rates
+		2) DADA2_tax_OTU_table.biom #Otu table not filtered for low abundance OTUs
+		3) DADA2_tax_OTU_table_low_filtered.biom #Otu table filtered for low abundance OTUs. filter_otus_from_otu_table.py -i INPUT -o OUTPUT --min_count_fraction 0.00005
+		4) otus.tre #The tree file
 
 
 **"Vsearch_OTU_tables"**, **"Uparse_OTU_tables"**: These folders have the same files inside.
