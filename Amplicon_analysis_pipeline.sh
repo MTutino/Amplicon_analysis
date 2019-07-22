@@ -8,32 +8,6 @@
 #
 #*****************************************************************************************************
 
-####################################################
-#####	MODULES RECUIRED	########################
-
-## THESE WORK IN CSF2
-##(Cutadapt is included in anaconda)
-#module load apps/binapps/anaconda/2.2.0
-#module load apps/gcc/sickle/1.33
-#module load apps/gcc/bioawk/27-08-2013
-#module load apps/gcc/pandaseq/2.8
-#module load apps/binapps/spades/3.5.0
-#module load apps/binapps/fastqc/0.11.3
-
-
-#module load apps/binapps/usearch/6.1.544
-#module load apps/gcc/qiime/1.8.0
-#module load apps/binapps/vsearch/1.1.3
-##(ChimeraSlayer is included in mnicrobiomeutil)
-#module load apps/binapps/microbiomeutil/r20110519
-#module load apps/binapps/blast/legacy/2.2.26
-#module load apps/binapps/usearch/8.0.1623
-#module load apps/binapps/fasta-splitter/0.2.4
-#module load apps/binapps/rdp_classifier/2.2
-#module load compilers/gcc/6.3.0
-#module load apps/gcc/R/3.4.3
-
-
 
 # Best options for amplicon sequencing illumina miseq analysis V3-V4: -q 20 -l 10 -o 10 -L 380
 
@@ -542,9 +516,6 @@ fi
 ################################################################## SECOND_STEP ###################################################################
 		# Execute appropriate pipeline based on -P option
 		case "$PIPELINE_NAME" in
-		    "QIIME")
-			source $DIR/QIIME.sh
-			;;
 		    "UPARSE")
 			source $DIR/UPARSE.sh
 			;;
