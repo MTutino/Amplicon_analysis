@@ -107,7 +107,7 @@ make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/unweighted_u
 make_bootstrapped_tree.py -m $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/master_tree.tre -s $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/upgma_cmp/jackknife_support.txt -o $RESULTS_PATH/Jackknifed_betadiversity/weighted_unifrac/jackknife_weighted_unifrac.pdf ;
 
 #Create the heatmap in html format		
-make_otu_heatmap.py -i $BIOM -o $RESULTS_PATH/Heatmap -t $TREE  -m $METATABLE;	
+make_otu_heatmap.py -i $BIOM -o $RESULTS_PATH/OTU_Heatmap.pdf -t $TREE  -m $METATABLE;	
 	
 echo "Third step finished at $(date|awk '{print $4}')" >> $LOG;
 	
