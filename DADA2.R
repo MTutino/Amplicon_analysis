@@ -2,7 +2,6 @@
 library(dada2)
 library(ShortRead)
 library(tidyverse)
-library(phyloseq)
 library(biomformat)
 
 ############	READ THE FILES AND THE ENV VARIABLES	############
@@ -11,7 +10,7 @@ library(biomformat)
 # PHRED SCORE
 PHRED<-Sys.getenv("PHRED")
 # PATH TO SCRIPTS
-DIR<-Sys.getenv("DIR")
+DIR<-Sys.getenv("REF_DATA_PATH")
 # Number of cores to use
 NCORES<-Sys.getenv("NSLOTS")
 NCORES<-as.integer(NCORES)
@@ -146,13 +145,6 @@ taxa.plus <- addSpecies(taxa, paste(DIR,"SILVA/DADA2_SILVA123/silva_species_assi
 head(unname(taxa.plus))
 
 colnames(taxa.plus) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus","Species")
-
-#Tranfer to phyloseq
-#ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE),  
-#               tax_table(taxa.plus))
-#data = biom_data(otu_table(ps))
-#omd = observation_metadata(tax_table(ps))			   
-#otu_biom<-make_biom(seqtab.nochim, sample_metadata = NULL,taxa.plus, id = NULL)
 
 print("Save sequence file: DADA2_OTU_tables/seqs.fa")
 #Save sequence file:
