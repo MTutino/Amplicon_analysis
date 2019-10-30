@@ -18,8 +18,8 @@ biom summarize-table -i $BIOM -o $RESULTS_PATH/table_summary.txt;
 #Check if there are samples with less than 5000 sequences. These will be excluded because it would be a problem for subsequent analyses
 #In case samples with <5K seqs are found a new OTU table will be made
 #Get a list of samples with more and less than 5000 sequences
-LESSFIVEK=$(tail -n+17 $RESULTS_PATH/table_summary.txt |awk -F ":" '{if ( $2 <= 5000) print $1"\t"$2 }'|sed 's/ //g');
-MOREFIVEK=$(tail -n+17 $RESULTS_PATH/table_summary.txt |awk -F ":" '{if ( $2 >= 5000) print $1 }'|sed 's/ //g');
+LESSFIVEK=$(tail -n+17 $RESULTS_PATH/table_summary.txt |sed 's/,//g'|awk -F ":" '{if ( $2 <= 5000) print $1"\t"$2 }'|sed 's/ //g');
+MOREFIVEK=$(tail -n+17 $RESULTS_PATH/table_summary.txt |sed 's/,//g'|awk -F ":" '{if ( $2 >= 5000) print $1 }'|sed 's/ //g');
 
 #If there are samples with less than 5000 sequences, filter them out from the OTU table for subsequent analyses
 if [[ -n $LESSFIVEK ]];then 
@@ -47,7 +47,7 @@ if [[ -n $LESSFIVEK ]];then
 fi;
 	
 #Extract the minimum depth to use in beta-diversity
-MINDEPTH=$(grep Min $RESULTS_PATH/table_summary.txt |awk -F " " '{print $2}'|awk -F "." '{print $1}');
+MINDEPTH=$(grep Min $RESULTS_PATH/table_summary.txt |sed 's/,//g'|awk -F " " '{print $2}'|awk -F "." '{print $1}');
 	
 #Beta-diversity analysis
 echo "beta_diversity_through_plots.py $(date|awk '{print $4}')" >> $LOG;
