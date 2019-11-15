@@ -326,8 +326,12 @@ if [[ -z $STEP3 ]]; then
 
 
 
-		#Check that final_name exists
+		#Check that final_name exists		
+		awk 'BEGIN{OFS="\t"}{gsub(/_/,"-",$2);print}' Final_name.txt > Final_name.txt.tmp
+		cp Final_name.txt.tmp Final_name.txt
+		rm Final_name.txt.tmp
 		NAMES="Final_name.txt"
+		
 		if [ -f $NAMES ]; then
 				echo "Checking for $NAMES" >> $LOG;
 				echo "$NAMES exists" >> $LOG;
@@ -389,7 +393,7 @@ if [[ -z $STEP3 ]]; then
 		fi;
 
 		#Check if names in the first column of metatable and second column of Final_name match
-		awk '{print $2}' $NAMES > Metatable_temp; grep -v \# $METATABLE_1|awk '{print $1}' >> Metatable_temp ;
+		awk '{print $2}' $NAMES > Metatable_temp; grep -v \# $METATABLE|awk '{print $1}' >> Metatable_temp ;
 		MERGED=$(echo "$(sort Metatable_temp|uniq|awk NF|wc -l)");
 		META=$(grep -v \# $METATABLE_1|awk '{print $1}'|awk NF|wc -l);
 		if [[ $MERGED -ne $META ]]; then 

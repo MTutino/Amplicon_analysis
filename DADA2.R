@@ -20,11 +20,15 @@ print(paste("Number of cores used",NCORES))
 #setwd(getSrcDirectory()[1])
 
 # Read list of final names
+#final_names<-read_tsv("Final_name.txt", col_names = F)
+#metatable<-read_tsv("Metatable.txt", col_names = T)
 final_names<-read_tsv("Final_name.txt", col_names = F)
-metatable<-read_tsv("Metatable.txt", col_names = T)
+metatable<-read_tsv(Sys.getenv("METATABLE"), col_names = T)
 # Select only the sample ID and run columns
 metatable<-select(metatable, matches("#SampleID|run"))
 # Left join final_name and metatable by sample ID
+# Change "_" to "-" to match the Metatable 
+final_names$X2<-gsub("_","-",final_names$X2)
 final_names<-left_join(final_names,metatable, by = c("X2" = "#SampleID"))
 colnames(final_names)[ncol(final_names)]<-"X3"
 
