@@ -2,7 +2,7 @@
 
 set -o errexit
 
-echo -e "Vsearch pipeline started at $(date|awk '{print $4}')\nVsearch version 1.1.3" >> $LOG;
+echo -e "Vsearch pipeline started at $(date|awk '{print $4}')\nVsearch version 2.10.4" >> $LOG;
 
 #**************JUST A TEST*********
 #CORE="$DIR/Silva/Silva119_release_aligned_rep_files/90_16S_only/Silva_119_rep_set90_aligned_16S_only_gfiltered/Silva_119_rep_set90_aligned_16S_only_pfiltered.fasta"
