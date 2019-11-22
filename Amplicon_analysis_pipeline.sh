@@ -435,8 +435,8 @@ if [[ $PIPELINE != "DADA2"  ]]; then
 				echo "Multiplexed.fasta already exists. I will go straight to step 2." >> $LOG;
 		else
 				#The variable will contain the first and second column of metatable file (folder name and barcode)
-				BARCODE=$(awk '{if (NR==1) next;print $1"\t"$2}' $METATABLE_1);
-					
+				BARCODE=$(awk '{if (NR==1) next;print $1"\t"$2}' $METATABLE);
+				echo $BARCODE	
 		
 				#New and easier method to multiplex fasta files
 				mkdir -p Multiplexed_files;
@@ -444,11 +444,10 @@ set +e
 				for i in $(ls -d */|sed 's|[/]||g'); do 
 set -e
 						while read -r foldername barcode ; do
-								if [[ "$i" == "$foldername" ]]; then 
+								if [[ "$i" == "$foldername" ]]; then
 										foldernamemod=$(echo $foldername|sed 's/_/-/g');
 										awk -v k=$foldernamemod"_"$barcode '/^>/{gsub(">","",$0);split(k,a,"_");$0=">"a[1]"_"(++i)" "$0" orig_bc="a[2]" new_bc="a[2]" bc_diffs=0"}1' < $i/*overlap.fasta
 								fi >> Multiplexed_files/multiplexed.fasta;
-								oldnamemod=
 						done <<< "$BARCODE";
 				done;
 
