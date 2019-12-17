@@ -16,8 +16,9 @@ which vsearch >> $LOG
 mkdir -p Multiplexed_files/Vsearch_pipeline ;
 # Dereplication
 echo "--derep_fulllength (dereplicate and discard singletons) $(date|awk '{print $4}')" >> $LOG;
-$VSEARCH --derep_fulllength Multiplexed_files/multiplexed_linearized.fasta --output Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2.fasta --sizeout --minuniquesize 2;
-SINGLETONS=$(grep "uniques written" *.e$JOB_ID);
+$VSEARCH --derep_fulllength Multiplexed_files/multiplexed_linearized.fasta --output Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2.fasta --sizeout --minuniquesize 2 2>vsearch_derep_fulllength.err;
+cat vsearch_derep_fulllength.err >&2
+SINGLETONS=$(grep "uniques written" vsearch_derep_fulllength.err);
 echo $SINGLETONS|awk '{print "Singletons discarded "$7" ("$4" reads)"}'|sed 's/(//;s/)//' >> $LOG;
 				
 # De novo chimera removal
@@ -30,8 +31,9 @@ $VSEARCH --cluster_size Multiplexed_files/Vsearch_pipeline/multiplexed_linearize
 				
 # Reference chimera removal
 echo -e "--uchime_ref $(date|awk '{print $4}')\nReference: RDPClassifier_16S_trainsetNo14" >> $LOG;
-$VSEARCH --uchime_ref Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_DNchimerafiltered.fasta --db $CHIM  --nonchimeras Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta;				
-CHIMERAS=$(grep -E Found\|suspicious *.e$JOB_ID);
+$VSEARCH --uchime_ref Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_DNchimerafiltered.fasta --db $CHIM  --nonchimeras Multiplexed_files/Vsearch_pipeline/multiplexed_linearized_dereplicated_mc2_repset_nonchimeras.fasta 2>vsearch_uchime_ref.err;
+cat vsearch_uchime_ref.err >&2
+CHIMERAS=$(grep -E Found\|suspicious vsearch_uchime_ref.err);
 echo $CHIMERAS|awk '{print "De novo chimera removal found "$3" chimeras ["$2" seqs], "$6" non chimeras ["$5" seqs], suspicious candidates "$10" ["$9" seqs]\nClosed-reference chimera removal found "$18" chimeras ["$17" OTUs], "$21" non chimeras ["$20" OTUs], suspicious candidates "$25" ["$24" OTUs]"}'|sed 's/(//g;s/)//g' >> $LOG;
 #echo $CHIMERAS|awk '{print "De novo chimera removal found "$9" chimeras ["$8" seqs], "$12" non chimeras ["$11" seqs], suspicious candidates "$16" ["$15" seqs]\nClosed-reference chimera removal found "$24" chimeras ["$23" OTUs], "$27" non chimeras ["$26" OTUs], suspicious candidates "$31" ["$30" OTUs]"}'|sed 's/(//g;s/)//g' >> $LOG;	
 #Before adding the metatable check
