@@ -340,15 +340,16 @@ if [[ -z $STEP3 ]]; then
 				echo -e "I could not find the file \"$NAMES\". It is misspelled or it does not exist. This file is required to start the analysis." >> $LOG;
 				exit 1 ;
 		fi;
-
-	# Get number of columns in the Final_name.txt
-	#col_count=$(awk '{print NF}' $NAMES | sort -nu|tail -n1)
-	# Check that the file has the required 3 fields
-	#if [ $col_count -lt 3 ];then
-	#	echo -e "The file \"$NAMES\" does not have the right number of columns" >> $LOG;
-	#	exit 1;
-	#fi
-
+	if [[ $PIPELINE == "DADA2" ]]; then
+		# Get number of columns in the Final_name.txt
+		col_count=$(awk '{print NF}{exit}' $NAMES)
+		# Check that the file has the required 3 fields
+		if [[ $col_count -ne 3 ]]; then
+			echo -e "The file \"$NAMES\" does not have the 3 columns required by DADA2. Is the \"run\" column missing?" >> $LOG;
+			exit 1;
+		fi
+	fi
+	
 		#Check that there is a unique name per sample and that the samples are spelt right
 		#Get the number of unique final names
 		FIN_NAME=$(awk '{print $2}' $NAMES|awk NF|sort|uniq|wc -l);
