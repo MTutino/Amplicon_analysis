@@ -13,7 +13,7 @@ It is divided in 3 steps:
 	
 		Vsearch pipeline: A freely available programme almost identical to Uparse but not limited to 4Gb RAM
 		
-		DADA2
+		DADA2: An R package to infer exact amplicon sequence variants (ASVs) 
 	
 	3)  QIIME to perform beta and alpha diversity analysis
 
@@ -33,7 +33,7 @@ You will have to run the programme (or the jobscript if you are using it in CSF)
 
 **Final_name.txt:**
 
-Final_name.txt is a text tab-delimited file with two columns without any header. 
+Final_name.txt is a text tab-delimited file of two columns without any header. 
 The first column is a list of your files' name, you can get the list this way
 
 	for i in $(ls *fastq*);do echo $(basename ${i});done
@@ -59,7 +59,7 @@ For the final name the only accepted special characters are underscore "_", dot 
 
 This file is important for the third step. You have to use a specific format. 
 You can find a description of it on QIIME website for more information (http://qiime.org/documentation/file_formats.html).
-The column Run, defining the sequencing run, must be included when using DADA2
+The column Run, defining the sequencing run, must be included when using DADA2. If the samples were sequenced in the same run, simply use the same run identifier.
 
 **EXAMPLE:**
 
